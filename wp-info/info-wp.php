@@ -277,3 +277,155 @@ Container::make('post_meta', 'resort_city', 'Доп. поля')
 <!-- Выводим картинку фоном в блоке -->
 	<div class="header-services__img" style="background-image: url(<?php echo $banner?>);"></div>
 <!-- ============================================================================================================================================ -->
+
+
+
+
+<!-- Яндекс карта с инд меткой и адресом из админки -->
+		<script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+
+		<script>
+			ymaps.ready(init); 
+
+			function init () {
+				var myMap = new ymaps.Map("map", {
+        // Координаты центра карты
+        center:<?php echo carbon_get_theme_option('map_point') ?>,
+        // Масштаб карты
+        zoom: 17,
+        // Выключаем все управление картой
+        controls: []
+      }); 
+
+				var myGeoObjects = [];
+
+    // Указываем координаты метки
+    myGeoObjects = new ymaps.Placemark(<?php echo carbon_get_theme_option('map_point') ?>,{
+    								// hintContent: '<div class="map-hint">Авто профи, Курск, ул.Комарова, 16</div>',
+    								balloonContent: '<div class="map-hint"><?php echo carbon_get_theme_option('text_map') ?>', },{
+    								iconLayout: 'default#image',
+                    // Путь до нашей картинки
+                    iconImageHref:  '<?php bloginfo("template_url"); ?>/img/icons/map-marker.svg',  
+                    // Размеры иконки
+                    iconImageSize: [65, 65],
+                    // Смещение верхнего угла относительно основания иконки
+                    iconImageOffset: [-25, -100]
+                  });
+
+    var clusterer = new ymaps.Clusterer({
+    	clusterDisableClickZoom: false,
+    	clusterOpenBalloonOnClick: false,
+    });
+    
+    clusterer.add(myGeoObjects);
+    myMap.geoObjects.add(clusterer);
+    // Отключим zoom
+    myMap.behaviors.disable('scrollZoom');
+
+  }
+</script>
+<!-- ============================================================================================================================================ -->
+
+
+
+
+
+<!-- Валидация формы в связвке с формой отправки ниже -->
+<script>
+    jQuery(".form__btn").click(function(e){ 
+
+        e.preventDefault();
+        var name = $(this).siblings('input[name=name]').val();
+        var email = $(this).siblings('input[name=email]').val();
+        var tel = $(this).siblings('input[name=tel]').val();
+        
+        if((tel == "")||(tel.indexOf("_")>0)) {
+            $(this).siblings('input[name=tel]').css("background-color","#ff91a4")
+        } else {
+            var  jqXHR = jQuery.post(
+                allAjax.ajaxurl,
+                {
+                    action: 'send_work',        
+                    nonce: allAjax.nonce,
+                    name: name,
+                    email: email,
+                    tel: tel,
+                    formsubject: jQuery(this).data("formname"),
+                }   
+            );
+                    
+            jqXHR.done(function (responce) {  //Всегда при удачной отправке переход для страницу благодарности
+                document.location.href = 'http://lipskiy-konsalting.ru/stranicza-blagodarnosti/';   
+            });
+                    
+            jqXHR.fail(function (responce) {
+                alert("Произошла ошибка. Попробуйте позднее.");
+            }); 
+
+        }
+    });
+</script>
+<!-- ============================================================================================================================================ -->
+
+
+
+
+<!-- Подключение Ajax в файл function -->
+<script>
+// function lipsky_scripts() {
+// 	wp_enqueue_style( 'lipsky-style', get_stylesheet_uri() );
+
+// 	wp_enqueue_script( 'jquery');
+
+// 	wp_enqueue_script( 'lipsky-inputmask', get_template_directory_uri() . '/js/jquery.inputmask.bundle.js', array(), 1.0, true );
+
+// 	wp_enqueue_script( 'lipsky-main', get_template_directory_uri() . '/js/main.js', array(), 1.0, true );
+
+
+
+
+	wp_localize_script( 'lipsky-main', 'allAjax', array( //- lipsky-main - название главного стиля js
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce'   => wp_create_nonce( 'NEHERTUTLAZIT' )
+    ) );
+
+
+
+
+// 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+// 		wp_enqueue_script( 'comment-reply' );
+// 	}
+// }
+</script>
+<!-- ============================================================================================================================================ -->
+
+
+
+
+
+<!-- Отправщик в файле fuction -->
+add_action( 'wp_ajax_send_work', 'send_work' );
+add_action( 'wp_ajax_nopriv_send_work', 'send_work' );
+
+  function send_work() {
+    if ( empty( $_REQUEST['nonce'] ) ) {
+      wp_die( '0' );
+    }
+    
+    if ( check_ajax_referer( 'NEHERTUTLAZIT', 'nonce', false ) ) {
+      
+      $headers = array(
+        'From: Сайт «ЛИПСКИЙ И ПАРТНЕРЫ» <noreply@lipskiy-konsalting.ru>',
+        'content-type: text/html',
+      );
+    
+      add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
+      if (wp_mail(carbon_get_theme_option( 'as_email_send' ), 'Заявка с сайта «ЛИПСКИЙ И ПАРТНЕРЫ»', '<strong>Имя:</strong> '.$_REQUEST["name"]. '<br/> <strong>E-mail:</strong> '.$_REQUEST["email"]. ' <br/> <strong>Телефон:</strong> '.$_REQUEST["tel"], $headers))
+        wp_die("<span style = 'color:green;'>Мы свяжемся с Вами в ближайшее время.</span>");
+      else wp_die("<span style = 'color:red;'>Сервис недоступен попробуйте позднее.</span>");
+      
+    } else {
+      wp_die( 'НО-НО-НО!', '', 403 );
+    }
+  }
+<!-- ============================================================================================================================================ -->
