@@ -282,7 +282,7 @@ Container::make('post_meta', 'resort_city', 'Доп. поля')
 
 
 <!-- Яндекс карта с инд меткой и адресом из админки -->
-		<script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+		<script src="//api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 
 		<script>
 			ymaps.ready(init); 
@@ -324,6 +324,12 @@ Container::make('post_meta', 'resort_city', 'Доп. поля')
 
   }
 </script>
+<!-- ============================================================================================================================================ -->
+
+
+
+<!-- Правильное подключение карты на сайт -->
+<script src="//api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
 <!-- ============================================================================================================================================ -->
 
 
@@ -428,4 +434,62 @@ add_action( 'wp_ajax_nopriv_send_work', 'send_work' );
       wp_die( 'НО-НО-НО!', '', 403 );
     }
   }
+<!-- ============================================================================================================================================ -->
+
+
+
+
+
+<!-- Кнопка окрашивания поля или любого присвоенного класса css -->
+В carbon-filds создаем поле:
+  Field::make('color', 'color_field', 'Цвет секции'),
+    // ->add_class('color-section'),
+
+В файле function.php пишем код:
+function my_styles_method() {
+	// #ff0000
+	$color = carbon_get_the_post_meta('color_field');
+	$custom_css = "  
+		.services-info__g {    - <!-- присваиваем класс которому нужно изменить цвет. -->
+			background: {$color} ;
+		}
+	";
+
+	wp_add_inline_style( 'lipsky-style', $custom_css );
+}
+
+
+add_action( 'wp_enqueue_scripts', 'my_styles_method' );
+<!-- ============================================================================================================================================ -->
+
+
+
+
+
+<!-- Вывод комплексного поля. Чекбокс выбора секции с классом + рич-поле. Если чек стоит то эта секция, если нет то другая -->
+<main>
+
+	<?php	 $complex = carbon_get_post_meta( $post->ID, 'complex_field');
+	if ( ! empty( $complex ) ): ?>
+		<?php foreach ( $complex as $compl ): ?>
+
+
+		<?php	if (!empty($compl['checkbox_pay_exc'])) {
+				echo '<section id="services-info" class="services-info services-info__g">';
+			}
+			else {
+				echo '<section id="services-info" class="services-info services-info__w">';
+			}
+			?> 
+
+			<!-- <section id="services-info" class="services-info services-info__g"> -->
+				<div class="container">
+					<?php echo $compl['text_field'] ?>
+				</div>
+			</section>
+		<?php endforeach; ?>
+	<?php endif; ?>
+
+</main>
+<main>
 <!-- ============================================================================================================================================ -->
