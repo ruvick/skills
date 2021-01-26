@@ -172,6 +172,34 @@ foreach( $posts as $post ){
 
 
 
+<!-- Вывод записей таксономий. Конкретной таксономии, и определнного колличества записей -->
+				<div class="smart-equip__col d-flex">
+
+        <?
+           $args = array(
+            'posts_per_page' => 4,
+            'post_type' => 'asgproduct',
+            'tax_query' => array(
+              array(
+                'taxonomy' => 'asgproductcat',
+                'field' => 'id',
+                'terms' => array(41)
+              )
+            )
+          );
+          $query = new WP_Query($args);
+          
+          foreach( $query->posts as $post ){
+            $query->the_post();
+            get_template_part('template-parts/product-loop-new');
+          }  
+          wp_reset_postdata();
+        ?>
+
+				</div>
+<!-- =========================================================================================================================================== -->
+
+
 <!-- Вывод Заголовка страницы из админки -->
 		<h1 class="header-services__title">
 			<?php the_title();?>
@@ -492,4 +520,13 @@ add_action( 'wp_enqueue_scripts', 'my_styles_method' );
 
 </main>
 <main>
+<!-- ============================================================================================================================================ -->
+
+
+
+<!-- Вывод блока. Один показываем, другой скрываем -->
+jqXHR.done(function (responce) {
+	jQuery(".headen_form_blk, .newButton").hide();
+	jQuery('.SendetMsg').show();
+});
 <!-- ============================================================================================================================================ -->
