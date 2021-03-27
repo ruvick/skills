@@ -48,6 +48,22 @@ add_action( 'after_setup_theme', function(){
 		'menu-3' => 'Меню Доставка',
 	] );
 } ); 
+
+<!-- Добавляем свой класс к пункту меню в админке -->
+add_filter( 'nav_menu_css_class', 'change_menu_item_css_classes', 10, 4 );
+
+function change_menu_item_css_classes( $classes, $item, $args, $depth ) {
+  if( 3674 === $item->ID  && 'menu_main' === $args->theme_location ){
+    $classes[] = 'menu__catalogy';
+  }
+
+  if( 3670 === $item->ID  && 'menu_main' === $args->theme_location ){
+    $classes[] = 'menu__shares';
+  }
+
+  return $classes;
+}
+
 <!-- =========================================================================================================================================== -->
 
 
@@ -93,6 +109,23 @@ function wp_corenavi() {
 
 <!-- В HTML-коде, который получается в результате вывода функции, присутствуют все необходимые CSS-классы, 
 которые можно использовать для оформления любого элемента навигации  -->
+
+<!-- css --> 
+.page-numbers.current {
+    background-color: #7cce45;
+    color: #fff;
+}
+.page-numbers {
+    padding: 4px 6px;
+    border: 1px solid #7cce45;
+    margin: 2px;
+    text-align: center;
+    width: 30px;
+    color: #7cce45;
+}
+.prev.page-numbers, .next.page-numbers {
+    width: auto;
+}
 <!-- =========================================================================================================================================== -->
 
 
@@ -352,6 +385,15 @@ Container::make('post_meta', 'resort_city', 'Доп. поля')
 
   }
 </script>
+
+.block__map {
+  /* max-width: 1300px; */
+  width: 100%;
+  height: 600px;
+}
+.ymaps-2-1-77-gotoymaps__container, .ymaps-2-1-77-gototech, .ymaps-2-1-77-copyright__content, .ymaps-2-1-78-copyright__wrap, .ymaps-2-1-78-map-copyrights-promo {
+    display: none !important;
+}
 <!-- ============================================================================================================================================ -->
 
 
@@ -530,3 +572,32 @@ jqXHR.done(function (responce) {
 	jQuery('.SendetMsg').show();
 });
 <!-- ============================================================================================================================================ -->
+
+
+
+
+<!-- Выводим текст из записи и обрезаем колличество символов -->
+<!-- https://wp-kama.ru/id_31/obrezka-teksta-zamenyaem-the-excerpt.html -->
+<p>
+	<?php 
+		$maxchar = 200;
+		$text = strip_tags( get_the_excerpt() );
+		echo mb_substr( $text, 0, $maxchar );
+	?>
+</p>
+<!-- ============================================================================================================================================ -->
+
+
+
+Отзывчивый margin
+	li {
+@media (max-width: 1100px) {
+	margin: 0px 54px / 1170px * 100vw 0px 0px;
+	}									
+}
+<!-- ============================================================================================================================================ -->
+
+
+Выводим описание рубрики
+<?php echo category_description(); ?> Любой
+<?php echo category_description(3); ?> Конкретной по id
