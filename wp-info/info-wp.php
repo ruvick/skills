@@ -28,11 +28,15 @@
 <!-- =========================================================================================================================================== -->
 
 
+<!-- Подпись главной стр. Выводится из настроек админки -->
+<title><?php wp_title(); ?></title>
+<!-- =========================================================================================================================================== -->
+
 
 <!-- В html файле вставляем вместо сверстанного меню код. Три разных меню. Создаются в файле functions.php -->
 <!-- Меню -->
 	<?php wp_nav_menu( array('theme_location' => 'menu-1','menu_class' => 'ul-clean',
-		'container_class' => 'ul-clean','container' => false )); ?>
+		'container_class' => 'ul-clean','container' => false )); ?> 
 
 	<?php wp_nav_menu( array('theme_location' => 'menu-2','menu_class' => 'ul-clean',
 		'container_class' => 'ul-clean','container' => false )); ?>
@@ -601,3 +605,71 @@ jqXHR.done(function (responce) {
 Выводим описание рубрики
 <?php echo category_description(); ?> Любой
 <?php echo category_description(3); ?> Конкретной по id
+<!-- ============================================================================================================================================ -->
+
+
+
+Создаем переменную. Если она пуста то выводим что то или ничего не выводим.
+<?php
+	$price_old = carbon_get_post_meta(get_the_ID(),"offer_old_price");
+		if( strlen($price_old) == 0 ) { 
+			//echo '	Скидки нет';
+		} else if ( $price_old === 0 || $price_old === '0' ) {
+			//echo '<div class="availability-order">Скидки нет</div>';
+		} else {
+			echo "<p class='prod-card__price-old'> $price_old руб.</p>";
+		}
+?>
+<!-- ============================================================================================================================================ -->
+
+
+!EMPTY
+<!-- В комплексном поле да и не только, если у блока ничего не выводится, то не выводим этот блок -->
+<? if ( !empty($item['slider_discount'])) { ?>
+	<div class="info-sl__discounts">
+		<? echo $item['slider_discount']; ?>
+	</div>
+<? } ?>
+
+<!-- Тоже самое только переменная и не из комплексного поля -->
+<? $sku = carbon_get_post_meta(get_the_ID(),"offer_sku");	
+		if (!empty($sku)) { ?>
+		<div class="spacer__vendor">Артикул: <span><? echo $sku; ?></span></div>
+	<? } ?>
+
+<!-- Если подзаголовок пустой, секция не выводится -->
+<? if ( !empty(carbon_get_theme_option('about_home'))) { ?>
+		<section id="index-title" class="index-title">
+			<div class="container">
+			<h1><?php echo carbon_get_theme_option('about_home_title'); ?></h1>
+			<div class="index-title__subtitle">
+				<?php echo carbon_get_theme_option('about_home'); ?>
+			</div>
+
+			</div>
+		</section>
+	<? } ?>
+
+
+<!-- Выводим комплексное поле размеров чекбокса. Если ни один размер не задан, не выводим блок -->
+	<? 
+		$size_chart = carbon_get_the_post_meta('size_chart_complex'); 
+		if($size_chart) { ?>
+	
+		<p>Размер</p>
+		<div class="actions-block__options options d-flex">
+	<?
+		foreach($size_chart as $chart) { 
+	?>
+		<div onclick = "set_size('<? echo $chart['size_chart']; ?>')" class="option">
+			<? echo $chart['size_chart']; ?>
+			<input type="radio"  value="1" name="form[type]">
+		</div>
+	<?
+		}
+	?>
+	</div>
+	<? } ?>
+<!-- ============================================================================================================================================ -->
+
+
