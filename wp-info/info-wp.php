@@ -1,6 +1,6 @@
 
 <!-- Подключения template-parts -->
-<?php get_template_part('template-parts/header-cat');?>
+<?php get_template_part('template-parts/header-cat');?> 
 <!-- =========================================================================================================================================== -->
 
 
@@ -673,3 +673,229 @@ jqXHR.done(function (responce) {
 <!-- ============================================================================================================================================ -->
 
 
+
+<!-- Выводим в пунктах меню заголовки постов -->
+<ul class="galery-block__menu menu-galery">
+	<?php
+  	global $post;
+  	$args = array( 'numberposts' => -1, 'order' => 'ASC', 'offset'=> 1, 'category' => 21 );
+  	$myposts = get_posts( $args );
+  		foreach( $myposts as $post ){
+    		setup_postdata($post);
+  ?>
+		<li><a href="<?php the_permalink(); ?>" 
+			class="menu-galery__link"><?php the_title(); ?> (<?php echo carbon_get_post_meta(get_the_ID(),"number_img"); ?>)</a></li>
+  <?php 
+ 					 		}
+  	wp_reset_postdata();
+  ?>
+</ul>
+<!-- ============================================================================================================================================ -->
+
+
+
+<!-- Добавляем класс active к выбранному пункту меню -->
+$(".menu-galery li a").click(function (e) {
+		e.preventDefault();
+		$(".menu-galery li a").removeClass('active');
+		$(this).addClass('active');
+	})
+<!-- ============================================================================================================================================ -->
+
+
+
+<!-- МОДАЛЬНОЕ ОКНО ============================================================================================================================= -->
+<div style="display: none;">
+		<div class="box-modal box-modal-new box-modal-new__cust" id="question">
+			<div class="box-modal_close box-modal_close_new arcticmodal-close">X</div>
+			<img src = "<?php bloginfo("template_url")?>/img/similar-01.jpg" loading="lazy"/>
+			<div class = "formArctikBlk mod-zagr-tur">
+				<h2>Заказать звонок <span class = 'tkName'></span></h2>
+				<p>Наши специалисты свяжутся с Вами в течение 15 минут</p>  
+
+				<form action="#" class="form-question">
+					<div class = "SendetMsg" style = "display:none"> 
+						Ваше сообщение успешно отправлено.
+					</div>
+					<div class="headen_form_blk">
+						<input type = "text" name = "name" placeholder = "Имя*" id="form-question-name" class = "form-question__input input">
+						<input type = "tel" name = "tel" placeholder = "Телефон*" id="form-question-tel" class = "form-question__input input">
+					</div>
+					<div class="callback-note mod-zagr-tur__note">Нажимая на кнопку "Отправить", вы соглашаетесь с <a class="tdu" href="<?php echo get_permalink(1312);?>">условиями обработки персональных данных</a>.</div>
+					<button type="submit" class="newButton btn">Отправить</button>
+				</form>
+
+			</div>
+		</div>
+	</div>
+
+<!-- CSS  -->
+.box-modal-new {
+  max-width: 600px;
+  width: 100%;
+  padding: 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  position: relative;
+  min-height: 500px;
+  display: flex;
+  overflow: hidden;
+  background: #fff;
+  margin: 0 auto;
+}
+.box-modal_close_new {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  cursor: pointer;
+  padding: 6px;
+  font-size: 20px;
+}
+#question img {
+  width: 36%;
+}
+.mod-zagr-tur h2 {
+  font-size: 28px;
+  line-height: 25px;
+  margin-bottom: 30px;
+}
+.mod-zagr-tur p {
+  margin-bottom: 35px;
+  line-height: 1.2;
+}
+/*.mod-zagr-tur .SendetMsg {
+    margin-bottom: 60px;
+}*/
+.SendetMsg {
+  padding: 10px 0;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+.SendetMsg:before {
+  content: "";
+  width: 100%;
+  height: 70px;
+  background-image: url("data:image/svg+xml,%3Csvg version='1.1' id='Layer_1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' x='0px' y='0px' viewBox='0 0 507.2 507.2' style='enable-background:new 0 0 507.2 507.2;' xml:space='preserve'%3E%3Ccircle style='fill:%2332BA7C;' cx='253.6' cy='253.6' r='253.6'/%3E%3Cpath style='fill:%230AA06E;' d='M188.8,368l130.4,130.4c108-28.8,188-127.2,188-244.8c0-2.4,0-4.8,0-7.2L404.8,152L188.8,368z'/%3E%3Cg%3E%3Cpath style='fill:%23FFFFFF;' d='M260,310.4c11.2,11.2,11.2,30.4,0,41.6l-23.2,23.2c-11.2,11.2-30.4,11.2-41.6,0L93.6,272.8 c-11.2-11.2-11.2-30.4,0-41.6l23.2-23.2c11.2-11.2,30.4-11.2,41.6,0L260,310.4z'/%3E%3Cpath style='fill:%23FFFFFF;' d='M348.8,133.6c11.2-11.2,30.4-11.2,41.6,0l23.2,23.2c11.2,11.2,11.2,30.4,0,41.6l-176,175.2 c-11.2,11.2-30.4,11.2-41.6,0l-23.2-23.2c-11.2-11.2-11.2-30.4,0-41.6L348.8,133.6z'/%3E%3C/g%3E%3C/svg%3E%0A");
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  float: left;
+  margin: 10px 0;
+}
+.formArctikBlk {
+  padding: 35px 25px 20px 25px;
+}
+.form-question__input {
+  max-width: 300px;
+  width: 100%;
+  height: 40px;
+  border: 2px solid #ececec;
+  border-radius: 5px;
+  padding: 0 15px;
+  font-family: Lato;
+  font-weight: 400;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+.mod-zagr-tur__note {
+  margin-top: 30px;
+  margin-bottom: 20px;
+}
+.newButton {
+  width: 155px;
+  height: 45px;
+  cursor: pointer;
+  color: #fff;
+  border-radius: 10px;
+}
+
+@media (max-width: 550px) {
+	.box-modal-new {
+  	min-height: auto;}
+}
+@media (max-width: 515px) {
+	#question img {
+  	display: none;}
+	.formArctikBlk {
+    padding: 30px 15px;}
+		.form-question__input {
+    max-width: 100%;}
+}
+
+
+
+
+<!-- Отправщик из js  -->
+$('.newButton').click(function (e) {
+
+e.preventDefault();
+var name = $("#form-question-name").val();
+var tel = $("#form-question-tel").val();
+
+if (jQuery("#form-question-tel").val() == "") {
+	jQuery("#form-question-tel").css("border", "1px solid red");
+	return;
+}
+
+// if (jQuery("#sig-inp-e").val() == ""){
+// 	jQuery("#sig-inp-e").css("border","1px solid red");
+// 	return;
+// }
+
+else {
+	var jqXHR = jQuery.post(
+		allAjax.ajaxurl,
+		{
+			action: 'sendphone',
+			nonce: allAjax.nonce,
+			name: name,
+			tel: tel,
+		}
+	);
+
+	jqXHR.done(function (responce) {
+		jQuery(".headen_form_blk").hide();
+		jQuery('.SendetMsg').show();
+	});
+
+	jqXHR.fail(function (responce) {
+		alert("Произошла ошибка. Попробуйте позднее.");
+	});
+
+}
+});
+
+<!-- Открытие модального окна -->
+$(".popup-quest").on('click', function (e) {
+	e.preventDefault();
+	jQuery(".windows_form h2").html(jQuery(this).data("winheader"));
+	jQuery(".windows_form .subtitle").html(jQuery(this).data("winsubheader"));
+	jQuery("#question").arcticmodal();
+});
+
+<!-- Отправщик из functions  -->
+add_action( 'wp_ajax_sendphone', 'sendphone' );
+add_action( 'wp_ajax_nopriv_sendphone', 'sendphone' );
+
+  function sendphone() {
+    if ( empty( $_REQUEST['nonce'] ) ) {
+      wp_die( '0' );
+    }
+    
+    if ( check_ajax_referer( 'NEHERTUTLAZIT', 'nonce', false ) ) {
+      
+      $headers = array(
+        'From: Сайт '.COMPANY_NAME.' <'.MAIL_RESEND.'>', 
+        'content-type: text/html',
+      );
+    
+      add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
+       if (wp_mail(carbon_get_theme_option( 'as_email_send' ), 'Заказ звонка', '<strong>Имя:</strong> '.$_REQUEST["name"]. ' <br/> <strong>Телефон:</strong> '.$_REQUEST["tel"], $headers))
+        wp_die("<span style = 'color:green;'>Мы свяжемся с Вами в ближайшее время.</span>");
+      else wp_die("<span style = 'color:red;'>Сервис недоступен попробуйте позднее.</span>"); 
+      
+    } else {
+      wp_die( 'НО-НО-НО!', '', 403 );
+    }
+  }
