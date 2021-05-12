@@ -566,6 +566,41 @@ add_action( 'wp_enqueue_scripts', 'my_styles_method' );
 
 </main>
 <main>
+
+
+<!-- Выводим картинку с описанием и ссылкой из админки. Если чекбокс выбран, выводим один блок, если не выбран другой -->
+<div class="promo__row d-flex">
+      <?
+        $prom = carbon_get_the_post_meta('promo__complex');
+          if($prom) {
+            $promIndex = 0;
+            foreach($prom as $itemPr) {
+      ?>
+
+      <?php	if (!empty($itemPr['promo_checkbox'])) {
+				echo 
+          "<a href='" . $itemPr['promo_link'] . "' class='promo__item'>
+            <img src='" . wp_get_attachment_image_src($itemPr['promo_img'], 'full')[0] . "' class='promo__img'>
+          </a>";
+			}
+			else {
+				echo 
+        "<a href='" . $itemPr['promo_link'] . "' class='promo__item'>
+          <img src='" . wp_get_attachment_image_src($itemPr['promo_img'], 'full')[0] . "' class='promo__img'>
+          <p class='promo__subtitle'>" . $itemPr['promo_subtitle'] . "</p>
+          <div class='nuar_blk'></div>
+        </a>";
+			}
+
+			?> 
+
+      <?
+        $promIndex++;
+          }
+        }
+      ?>
+
+      </div>
 <!-- ============================================================================================================================================ -->
 
 
@@ -899,3 +934,37 @@ add_action( 'wp_ajax_nopriv_sendphone', 'sendphone' );
       wp_die( 'НО-НО-НО!', '', 403 );
     }
   }
+	<!-- ============================================================================================================================================ -->
+
+
+	// $(window).on('resize orientationchange', function () {
+	// 	$('.galary-sl-big').slick('resize');
+	// 	$('.galary-sl-small').slick('resize');
+	// 	$('.galary-sl-big').slick('setPosition');
+	// 	$('.galary-sl-small').slick('setPosition');
+	// });
+
+	// $('.galary-sl-small').slick('setPosition');
+
+	// $(document).ready(function () {
+	// 	var slider = $('.galary-sl-big').slick({
+	// 		// todo
+	// 	});
+	// 	slider.slick('reinit');
+	// });
+
+	// $(window).on('resize orientationchange', function () {
+	// 	$('.galary-sl-big').slick('resize');
+	// 	$('.galary-sl-small').slick('resize');
+	// });
+
+
+
+	// $(window).on('resize', function () {
+	// 	$('.galary-sl-big').slick('resize');
+	// 	$('.galary-sl-small').slick('resize');
+	// 	// alert('window was resized!');
+	// });
+
+	// $(".slider.slick-initialized").slick('reinit');
+	// $(".slider:not(.slick-initialized)").slick(config);
