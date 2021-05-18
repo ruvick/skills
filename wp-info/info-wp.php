@@ -936,7 +936,7 @@ add_action( 'wp_ajax_nopriv_sendphone', 'sendphone' );
   }
 	<!-- ============================================================================================================================================ -->
 
-
+<!-- Разные скрипты Slick слайдера -->
 	// $(window).on('resize orientationchange', function () {
 	// 	$('.galary-sl-big').slick('resize');
 	// 	$('.galary-sl-small').slick('resize');
@@ -968,3 +968,60 @@ add_action( 'wp_ajax_nopriv_sendphone', 'sendphone' );
 
 	// $(".slider.slick-initialized").slick('reinit');
 	// $(".slider:not(.slick-initialized)").slick(config);
+	<!-- ============================================================================================================================================ -->
+
+
+	<!-- Подключение галерии Lihtbox -->
+	$('figure img').parent('a').attr("data-lightbox", 'gallery');
+	<!-- ============================================================================================================================================ -->
+
+
+
+<!-- На основной странице выводим дочерние страницы с Заголовками, ссылками и картинками. Указываем ID Основной страницы 
+и выводим колиичество дочерних страниц -->
+	<?php $stati_children = new WP_Query(array(
+      'post_type' => 'page',
+      'order'       => 'ASC',
+      'post_parent' => get_the_ID()
+      )
+    );
+
+    if($stati_children->have_posts()) :
+    while($stati_children->have_posts()): $stati_children->the_post();
+    echo '
+      <div class="news-item">
+       <a href="'.get_the_permalink().'" class="news-item__img news-item__img-work" style="background-image: url( '.get_the_post_thumbnail_url( get_the_id(), 'full' ).' )"></a>
+       <div class="news-item__title">'.get_the_title().'</div>
+       <div class="news-item__text"><?php echo the_excerpt();?></div>
+       <div class="btn-wrap">
+         <a href="'.get_the_permalink().'" class="button">Подробнее</a>
+         <a href="#" class="button heating-card__btn" data-title="<?php the_title();?>">Узнать цену</a>
+       </div>
+      </div>';
+    endwhile;
+    endif; wp_reset_query();
+    ?>
+		<!-- ============================================================================================================================================ -->
+
+
+В категории выводим посты прикремленные к ней в конкретном html коде. Картинки и нумерацию выводим из карбон полей постов из комплексного поля, через переменную.
+		<div class="galery-block__galery-row">
+			<?php global $post; 
+				$args = array( 'posts_per_page' => -1, 'order' => 'ASC', 'category' => 21 );
+				$myposts = get_posts( $args );
+					foreach( $myposts as $post ){ setup_postdata($post);
+						$galw = carbon_get_the_post_meta('galery_works');
+					foreach($galw as $galw_item);
+			?>
+			<a href="<?php the_permalink(); ?>" class="galery-block__galery-img">
+				<img src = "<?php echo wp_get_attachment_image_src($galw_item['galery_works_img'], 'full')[0];?>" />
+				<div class="galery-color-block color-t-left">
+					<p><?php the_title(); ?> (<?php echo carbon_get_post_meta(get_the_ID(),"number_img"); ?> фото)</p>
+				</div>
+			</a>
+			<?php
+				}
+				wp_reset_postdata();
+			?>
+		</div>
+		<!-- ============================================================================================================================================ -->
