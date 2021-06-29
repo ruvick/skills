@@ -234,6 +234,32 @@ foreach( $posts as $post ){
         ?>
 
 				</div>
+
+				<div class="prod-card d-flex">
+
+<!-- Все посты из таксономии ultracat -->
+<?
+		$args = array(
+		'posts_per_page' => 8,
+		'post_type' => 'ultra',
+		'tax_query' => array(
+			array(
+				'taxonomy' => 'ultracat',
+				'field' => 'id',
+				'terms' => 'ultracat',
+				)
+			)
+		);
+		$query = new WP_Query($args);
+
+			foreach( $query->posts as $post ){
+			$query->the_post();
+			get_template_part('template-parts/product-elem');
+		}  
+		wp_reset_postdata();
+	?>
+
+</div>
 <!-- =========================================================================================================================================== -->
 
 
@@ -1279,4 +1305,87 @@ if( is_admin() && ! class_exists('Term_Meta_Image') ) {
 
 	}
 }
+// ============================================================================================================================================
+
+// Выводим дочерние категории кастомной таксономии
+<?php
+$terms = get_terms(
+  array(
+    'taxonomy'   => 'ultracat',
+    'hide_empty' => true,
+    'pad_counts'  => true,
+    'orderby' => 'count',
+    'order' => 'DESC',
+  )
+);
+  
+if ( ! empty( $terms ) && is_array( $terms ) ) {
+  echo '<ul class="list-my_taxonomy">';
+  foreach ( $terms as $term ) { ?>
+    <li>
+      <a href="<?php echo esc_url( get_term_link( $term ) ) ?>">
+        <?php echo $term->name; ?> (<?php echo $term->count; ?>)
+      </a>
+    </li>
+    <?php
+  }
+  echo '</ul>';
+}
+?>
+
+// Тоже самое только с подсветкой выбранного пункта
+<?php
+$terms = get_terms(
+  array(
+    'taxonomy'   => 'my_taxonomy',
+    'hide_empty' => true,
+    'pad_counts'  => true,
+    'orderby' => 'count',
+    'order' => 'DESC',
+  )
+);
+  
+if ( ! empty( $terms ) && is_array( $terms ) ) {
+    echo '<ul class="sidebar-offer_cat">';
+    foreach ( $terms as $term ) {
+        $curTerm = $wp_query->queried_object;
+        $class = ( $term->name == $curTerm->name ) ? 'active' : '';
+        ?>
+  
+        <li class="<?php echo $class; ?>">
+            <a href="<?php echo esc_url( get_term_link( $term ) ) ?>">
+                <?php echo $term->name; ?>
+            </a>
+        </li>
+  
+        <?php
+    }
+    echo '</ul>';
+}
+?>
+
+// Выводим дочерние категории конкретной кастомной таксономии
+<?php
+$terms = get_terms(
+	array(
+		'taxonomy'   => 'ultracat',
+		'child_of' => 13,
+		'hide_empty' => true,
+		'pad_counts'  => true, 
+		'orderby' => 'count',
+		'order' => 'ASC',
+	)
+);
+
+if ( ! empty( $terms ) && is_array( $terms ) ) {
+	foreach ( $terms as $term ) { ?>
+		<li>
+			<a href="<?php echo esc_url( get_term_link( $term ) ) ?>">
+				<?php echo $term->name; ?>
+			</a>
+		</li>
+		<?php
+	}
+}
+?>
 // ============================================================================================================================================
