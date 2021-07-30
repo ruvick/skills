@@ -357,11 +357,53 @@ function wp_corenavi() {
 ?>
 
 <?php the_excerpt(); ?> - настраиваемая функция
+
+
+<!-- Выводим в Основной рубрике ее дочерние рубрики с их записями и картинками -->
+<?php
+  $parent_id = 8;
+  $sub_cats = get_categories(array(
+    'child_of' => $parent_id,
+    'order'    => 'DESC',
+    'hide_empty' => 0
+  ));
+    if ($sub_cats) {
+    foreach ($sub_cats as $cat) {
+
+      echo '<h2 class="points-wrap-partners__title">' . $cat->name . '</h2>
+            <div class="points-wrap-partners-cards">';
+
+        $myposts = get_posts(array(
+          'numberposts' => -1,
+          'category'    => $cat->cat_ID,
+          'orderby'     => 'post_date',
+          'order'       => 'ASC',
+        ));
+      global $post;
+      foreach ($myposts as $post) {
+        setup_postdata($post);
+          echo '
+            <a href="' . get_permalink() . '" class="points-wrap-partners-cards-card">
+              <img src=" ' . get_the_post_thumbnail_url(get_the_ID(), "tominiatyre") . ' " alt="" class="points-wrap-partners-cards-card__img">
+              <p class="points-wrap-partners-cards-card__name">' . get_the_title() . '</p>
+              <div class="points-wrap-partners-cards-card-link">
+                <p class="points-wrap-partners-cards-card-link__desc">Подробнее</p>
+                <img src="' . get_template_directory_uri() . '/img/home/header-arrow-right.svg" alt="" class="points-wrap-partners-cards-card-link__img">
+              </div>
+            </a>';
+      }
+        echo '</div>';
+    }
+      wp_reset_postdata();
+	} 
+?>
 <!-- =========================================================================================================================================== -->
 
+<!-- Форматы даты и времени в WordPress -->
+<?php the_time('j F Y в H:i'); ?>
 
-
-
+<!-- Ссылка на разные варианты - https://wp-kama.ru/id_7433/formaty-daty-i-vremeni-v-wordpress.html -->
+<!-- =========================================================================================================================================== -->
 
 
 
@@ -662,14 +704,14 @@ jqXHR.done(function (responce) {
 <!-- ============================================================================================================================================ -->
 
 
-Выводим описание рубрики
+<!-- Выводим описание рубрики -->
 <?php echo category_description(); ?> Любой
 <?php echo category_description(3); ?> Конкретной по id
 <!-- ============================================================================================================================================ -->
 
 
 
-Создаем переменную. Если она пуста то выводим что то или ничего не выводим.
+<!-- Создаем переменную. Если она пуста то выводим что то или ничего не выводим. -->
 <?php
 	$price_old = carbon_get_post_meta(get_the_ID(),"offer_old_price");
 		if( strlen($price_old) == 0 ) { 
@@ -683,7 +725,7 @@ jqXHR.done(function (responce) {
 <!-- ============================================================================================================================================ -->
 
 
-!EMPTY
+<!-- !EMPTY -->
 <!-- В комплексном поле да и не только, если у блока ничего не выводится, то не выводим этот блок -->
 <? if ( !empty($item['slider_discount'])) { ?>
 	<div class="info-sl__discounts">
