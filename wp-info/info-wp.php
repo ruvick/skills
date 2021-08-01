@@ -32,8 +32,8 @@
 <!-- =========================================================================================================================================== -->
 
 
-<!-- Вывод картинки в переменной -->
-<!-- Пишем php-код на странице где выводим картинку -->
+<!-- Вывод картинки в переменной
+ Пишем php-код на странице где выводим картинку -->
 <?php 
 	$banner = wp_get_attachment_image_src( carbon_get_the_post_meta('resort_banner'), 'full')[0];
 		if(empty($banner)) {
@@ -81,6 +81,8 @@ Container::make('post_meta', 'resort_city', 'Доп. поля')
 <!-- ============================================================================================================================================ -->
 
 
+<!-- ТЕКСТОВЫЕ ===================================================================================================================================-->
+
 <!-- Вывод Заголовка страницы из админки -->
 <h1 class="header-services__title">
 	<?php the_title();?>
@@ -112,6 +114,7 @@ add_action('init', 'page_excerpt');
 			<?php the_excerpt(); ?>
 		</div>
 <!-- =========================================================================================================================================== -->
+<!-- ТЕКСТОВЫЕ END ===================================================================================================================================-->
 
 
 <!-- Вывод e-mail из поля карбон -->
@@ -120,10 +123,20 @@ add_action('init', 'page_excerpt');
 
 <!-- Вывод телефона из поля карбон -->
 <a href="tel:<? echo preg_replace('/[^0-9]/', '', $tel); ?>" class="contact-tel"><? echo $tel = carbon_get_theme_option("as_phones_1"); ?></a>
+
+
+<!-- Вывод из текстового поля -->
+<p><?echo carbon_get_post_meta(get_the_ID(),"offer_smile_descr"); ?></p>
 <!-- ============================================================================================================================================ -->
 
+<!-- Форматы даты и времени в WordPress -->
+<?php the_time('j F Y в H:i'); ?>
 
-<!-- Подключение меню -->
+<!-- Ссылка на разные варианты - https://wp-kama.ru/id_7433/formaty-daty-i-vremeni-v-wordpress.html -->
+<!-- =========================================================================================================================================== -->
+
+<!-- МЕНЮ ИЗ АДМИНКИ ==============================================================================================================================-->
+
 <!-- В html файле вставляем вместо сверстанного меню код. Три разных меню. Создаются в файле functions.php -->
 	<?php wp_nav_menu( array('theme_location' => 'menu-1','menu_class' => 'ul-clean',
 		'container_class' => 'ul-clean','container' => false )); ?> 
@@ -221,6 +234,7 @@ function wp_corenavi() {
 }
 <!-- =========================================================================================================================================== -->
 
+<!-- ТАКСОНОМИИ =================================================================================================================================-->
 
 <!-- Вывод записей таксономий. Конкретной таксономии, и определнного колличества записей -->
 <div class="smart-equip__col d-flex">
@@ -291,7 +305,10 @@ function wp_corenavi() {
 	?>
 </div>
 <!-- =========================================================================================================================================== -->
+<!-- ТАКСОНОМИИ END =================================================================================================================================-->
 
+
+<!-- КАТЕГОРИИ ======================================================================================================================================-->
 
 <!-- Выводим свои записи в Категории -->
 <div class="materials__column d-flex">
@@ -314,7 +331,6 @@ function wp_corenavi() {
 	} //конец if ?>
 </div>
 <!-- =========================================================================================================================================== -->
-
 
 <!-- Вывод определенных записией в любом месте -->
 <!-- https://wp-kama.ru/function/get_posts#include -->
@@ -399,188 +415,10 @@ function wp_corenavi() {
 ?>
 <!-- Ссылка - https://wp-kama.ru/question/pomogite-s-vyivodom-kategoriy -->
 <!-- =========================================================================================================================================== -->
-
-<!-- Форматы даты и времени в WordPress -->
-<?php the_time('j F Y в H:i'); ?>
-
-<!-- Ссылка на разные варианты - https://wp-kama.ru/id_7433/formaty-daty-i-vremeni-v-wordpress.html -->
-<!-- =========================================================================================================================================== -->
+<!-- КАТЕГОРИИ END======================================================================================================================================-->
 
 
-
-
-
-
-
-
-
-<!-- Яндекс карта с инд меткой и адресом из админки -->
-		<script src="//api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
-
-		<script>
-			ymaps.ready(init); 
-
-			function init () {
-				var myMap = new ymaps.Map("map", {
-        // Координаты центра карты
-        center:<?php echo carbon_get_theme_option('map_point') ?>,
-        // Масштаб карты
-        zoom: 17,
-        // Выключаем все управление картой
-        controls: []
-      }); 
-
-				var myGeoObjects = [];
-
-    // Указываем координаты метки
-    myGeoObjects = new ymaps.Placemark(<?php echo carbon_get_theme_option('map_point') ?>,{
-    								// hintContent: '<div class="map-hint">Авто профи, Курск, ул.Комарова, 16</div>',
-    								balloonContent: '<div class="map-hint"><?php echo carbon_get_theme_option('text_map') ?>', },{
-    								iconLayout: 'default#image',
-                    // Путь до нашей картинки
-                    iconImageHref:  '<?php bloginfo("template_url"); ?>/img/icons/map-marker.svg',  
-                    // Размеры иконки
-                    iconImageSize: [65, 65],
-                    // Смещение верхнего угла относительно основания иконки
-                    iconImageOffset: [-25, -100]
-                  });
-
-    var clusterer = new ymaps.Clusterer({
-    	clusterDisableClickZoom: false,
-    	clusterOpenBalloonOnClick: false,
-    });
-    
-    clusterer.add(myGeoObjects);
-    myMap.geoObjects.add(clusterer);
-    // Отключим zoom
-    myMap.behaviors.disable('scrollZoom');
-
-  }
-</script>
-
-.block__map {
-  /* max-width: 1300px; */
-  width: 100%;
-  height: 600px;
-}
-.ymaps-2-1-77-gotoymaps__container, .ymaps-2-1-77-gototech, .ymaps-2-1-77-copyright__content, .ymaps-2-1-78-copyright__wrap, .ymaps-2-1-78-map-copyrights-promo {
-    display: none !important;
-}
-<!-- ============================================================================================================================================ -->
-
-
-
-<!-- Правильное подключение карты на сайт -->
-<script src="//api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
-<!-- ============================================================================================================================================ -->
-
-
-
-
-
-<!-- Валидация формы в связвке с формой отправки ниже -->
-<script>
-    jQuery(".form__btn").click(function(e){ 
-
-        e.preventDefault();
-        var name = $(this).siblings('input[name=name]').val();
-        var email = $(this).siblings('input[name=email]').val();
-        var tel = $(this).siblings('input[name=tel]').val();
-        
-        if((tel == "")||(tel.indexOf("_")>0)) {
-            $(this).siblings('input[name=tel]').css("background-color","#ff91a4")
-        } else {
-            var  jqXHR = jQuery.post(
-                allAjax.ajaxurl,
-                {
-                    action: 'send_work',        
-                    nonce: allAjax.nonce,
-                    name: name,
-                    email: email,
-                    tel: tel,
-                    formsubject: jQuery(this).data("formname"),
-                }   
-            );
-                    
-            jqXHR.done(function (responce) {  //Всегда при удачной отправке переход для страницу благодарности
-                document.location.href = 'http://lipskiy-konsalting.ru/stranicza-blagodarnosti/';   
-            });
-                    
-            jqXHR.fail(function (responce) {
-                alert("Произошла ошибка. Попробуйте позднее.");
-            }); 
-
-        }
-    });
-</script>
-<!-- ============================================================================================================================================ -->
-
-
-
-
-<!-- Подключение Ajax в файл function -->
-<script>
-// function lipsky_scripts() {
-// 	wp_enqueue_style( 'lipsky-style', get_stylesheet_uri() );
-
-// 	wp_enqueue_script( 'jquery');
-
-// 	wp_enqueue_script( 'lipsky-inputmask', get_template_directory_uri() . '/js/jquery.inputmask.bundle.js', array(), 1.0, true );
-
-// 	wp_enqueue_script( 'lipsky-main', get_template_directory_uri() . '/js/main.js', array(), 1.0, true );
-
-
-
-
-	wp_localize_script( 'lipsky-main', 'allAjax', array( //- lipsky-main - название главного стиля js
-      'ajaxurl' => admin_url( 'admin-ajax.php' ),
-      'nonce'   => wp_create_nonce( 'NEHERTUTLAZIT' )
-    ) );
-
-
-
-
-// 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-// 		wp_enqueue_script( 'comment-reply' );
-// 	}
-// }
-</script>
-<!-- ============================================================================================================================================ -->
-
-
-
-
-
-<!-- Отправщик в файле fuction -->
-add_action( 'wp_ajax_send_work', 'send_work' );
-add_action( 'wp_ajax_nopriv_send_work', 'send_work' );
-
-  function send_work() {
-    if ( empty( $_REQUEST['nonce'] ) ) {
-      wp_die( '0' );
-    }
-    
-    if ( check_ajax_referer( 'NEHERTUTLAZIT', 'nonce', false ) ) {
-      
-      $headers = array(
-        'From: Сайт «ЛИПСКИЙ И ПАРТНЕРЫ» <noreply@lipskiy-konsalting.ru>',
-        'content-type: text/html',
-      );
-    
-      add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
-      if (wp_mail(carbon_get_theme_option( 'as_email_send' ), 'Заявка с сайта «ЛИПСКИЙ И ПАРТНЕРЫ»', '<strong>Имя:</strong> '.$_REQUEST["name"]. '<br/> <strong>E-mail:</strong> '.$_REQUEST["email"]. ' <br/> <strong>Телефон:</strong> '.$_REQUEST["tel"], $headers))
-        wp_die("<span style = 'color:green;'>Мы свяжемся с Вами в ближайшее время.</span>");
-      else wp_die("<span style = 'color:red;'>Сервис недоступен попробуйте позднее.</span>");
-      
-    } else {
-      wp_die( 'НО-НО-НО!', '', 403 );
-    }
-  }
-<!-- ============================================================================================================================================ -->
-
-
-
-
+<!-- ВЫВОД ИЗ ПОЛЕЙ И Т.Д. ====================================================================================================================== -->
 
 <!-- Кнопка окрашивания поля или любого присвоенного класса css -->
 В carbon-filds создаем поле:
@@ -603,10 +441,6 @@ function my_styles_method() {
 
 add_action( 'wp_enqueue_scripts', 'my_styles_method' );
 <!-- ============================================================================================================================================ -->
-
-
-
-
 
 <!-- Вывод комплексного поля. Чекбокс выбора секции с классом + рич-поле. Если чек стоит то эта секция, если нет то другая -->
 <main>
@@ -804,6 +638,174 @@ $(".menu-galery li a").click(function (e) {
 		$(this).addClass('active');
 	})
 <!-- ============================================================================================================================================ -->
+<!-- ВЫВОД ИЗ ПОЛЕЙ END===========================================================================================================================-->
+
+
+<!-- КАРТА ==============================================================================================================================================-->
+<!-- Яндекс карта с инд меткой и адресом из админки -->
+		<script src="//api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+
+		<script>
+			ymaps.ready(init); 
+
+			function init () {
+				var myMap = new ymaps.Map("map", {
+        // Координаты центра карты
+        center:<?php echo carbon_get_theme_option('map_point') ?>,
+        // Масштаб карты
+        zoom: 17,
+        // Выключаем все управление картой
+        controls: []
+      }); 
+
+				var myGeoObjects = [];
+
+    // Указываем координаты метки
+    myGeoObjects = new ymaps.Placemark(<?php echo carbon_get_theme_option('map_point') ?>,{
+    								// hintContent: '<div class="map-hint">Авто профи, Курск, ул.Комарова, 16</div>',
+    								balloonContent: '<div class="map-hint"><?php echo carbon_get_theme_option('text_map') ?>', },{
+    								iconLayout: 'default#image',
+                    // Путь до нашей картинки
+                    iconImageHref:  '<?php bloginfo("template_url"); ?>/img/icons/map-marker.svg',  
+                    // Размеры иконки
+                    iconImageSize: [65, 65],
+                    // Смещение верхнего угла относительно основания иконки
+                    iconImageOffset: [-25, -100]
+                  });
+
+    var clusterer = new ymaps.Clusterer({
+    	clusterDisableClickZoom: false,
+    	clusterOpenBalloonOnClick: false,
+    });
+    
+    clusterer.add(myGeoObjects);
+    myMap.geoObjects.add(clusterer);
+    // Отключим zoom
+    myMap.behaviors.disable('scrollZoom');
+
+  }
+</script>
+
+.block__map {
+  /* max-width: 1300px; */
+  width: 100%;
+  height: 600px;
+}
+.ymaps-2-1-77-gotoymaps__container, .ymaps-2-1-77-gototech, .ymaps-2-1-77-copyright__content, .ymaps-2-1-78-copyright__wrap, .ymaps-2-1-78-map-copyrights-promo {
+    display: none !important;
+}
+
+<!-- Правильное подключение карты на сайт -->
+<script src="//api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+<!-- КАРТА END ============================================================================================================================================ -->
+
+
+
+
+
+<!-- Валидация формы в связвке с формой отправки ниже -->
+<script>
+    jQuery(".form__btn").click(function(e){ 
+
+        e.preventDefault();
+        var name = $(this).siblings('input[name=name]').val();
+        var email = $(this).siblings('input[name=email]').val();
+        var tel = $(this).siblings('input[name=tel]').val();
+        
+        if((tel == "")||(tel.indexOf("_")>0)) {
+            $(this).siblings('input[name=tel]').css("background-color","#ff91a4")
+        } else {
+            var  jqXHR = jQuery.post(
+                allAjax.ajaxurl,
+                {
+                    action: 'send_work',        
+                    nonce: allAjax.nonce,
+                    name: name,
+                    email: email,
+                    tel: tel,
+                    formsubject: jQuery(this).data("formname"),
+                }   
+            );
+                    
+            jqXHR.done(function (responce) {  //Всегда при удачной отправке переход для страницу благодарности
+                document.location.href = 'http://lipskiy-konsalting.ru/stranicza-blagodarnosti/';   
+            });
+                    
+            jqXHR.fail(function (responce) {
+                alert("Произошла ошибка. Попробуйте позднее.");
+            }); 
+
+        }
+    });
+</script>
+<!-- ============================================================================================================================================ -->
+
+
+
+
+<!-- Подключение Ajax в файл function -->
+<script>
+// function lipsky_scripts() {
+// 	wp_enqueue_style( 'lipsky-style', get_stylesheet_uri() );
+
+// 	wp_enqueue_script( 'jquery');
+
+// 	wp_enqueue_script( 'lipsky-inputmask', get_template_directory_uri() . '/js/jquery.inputmask.bundle.js', array(), 1.0, true );
+
+// 	wp_enqueue_script( 'lipsky-main', get_template_directory_uri() . '/js/main.js', array(), 1.0, true );
+
+
+
+
+	wp_localize_script( 'lipsky-main', 'allAjax', array( //- lipsky-main - название главного стиля js
+      'ajaxurl' => admin_url( 'admin-ajax.php' ),
+      'nonce'   => wp_create_nonce( 'NEHERTUTLAZIT' )
+    ) );
+
+
+
+
+// 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
+// 		wp_enqueue_script( 'comment-reply' );
+// 	}
+// }
+</script>
+<!-- ============================================================================================================================================ -->
+
+
+
+
+
+<!-- Отправщик в файле fuction -->
+add_action( 'wp_ajax_send_work', 'send_work' );
+add_action( 'wp_ajax_nopriv_send_work', 'send_work' );
+
+  function send_work() {
+    if ( empty( $_REQUEST['nonce'] ) ) {
+      wp_die( '0' );
+    }
+    
+    if ( check_ajax_referer( 'NEHERTUTLAZIT', 'nonce', false ) ) {
+      
+      $headers = array(
+        'From: Сайт «ЛИПСКИЙ И ПАРТНЕРЫ» <noreply@lipskiy-konsalting.ru>',
+        'content-type: text/html',
+      );
+    
+      add_filter('wp_mail_content_type', create_function('', 'return "text/html";'));
+      if (wp_mail(carbon_get_theme_option( 'as_email_send' ), 'Заявка с сайта «ЛИПСКИЙ И ПАРТНЕРЫ»', '<strong>Имя:</strong> '.$_REQUEST["name"]. '<br/> <strong>E-mail:</strong> '.$_REQUEST["email"]. ' <br/> <strong>Телефон:</strong> '.$_REQUEST["tel"], $headers))
+        wp_die("<span style = 'color:green;'>Мы свяжемся с Вами в ближайшее время.</span>");
+      else wp_die("<span style = 'color:red;'>Сервис недоступен попробуйте позднее.</span>");
+      
+    } else {
+      wp_die( 'НО-НО-НО!', '', 403 );
+    }
+  }
+<!-- ============================================================================================================================================ -->
+
+
+
+
 
 
 
