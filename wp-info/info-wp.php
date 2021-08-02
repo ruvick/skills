@@ -445,6 +445,7 @@ add_action( 'wp_enqueue_scripts', 'my_styles_method' );
 <!-- Вывод комплексного поля. Чекбокс выбора секции с классом + рич-поле. Если чек стоит то эта секция, если нет то другая -->
 Field::make("checkbox", "checkbox_pay_exc", "Текст слева, Картинка справа")
   ->help_text('Меняет местами картинку и текст"'),
+	<!-- Чекбокс распологаем в комплексном поле Castom-fields -->
 <main>
 
 	<?php	 $complex = carbon_get_post_meta( $post->ID, 'complex_field');
