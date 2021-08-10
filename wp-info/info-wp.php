@@ -9,7 +9,7 @@
 
 
 <!-- Подпись главной стр. Выводится из настроек админки -->
-<title><?php wp_title(); ?></title>
+<title><?php wp_title(); ?></title> 
 <!-- =========================================================================================================================================== -->
 
 
@@ -25,7 +25,7 @@
 <!-- =========================================================================================================================================== -->
 
 
-<!-- Подключение картинок -->
+<!-- Подключение картинок --> 
 <img src="<?php echo get_template_directory_uri();?>/images/bus-card.jpg" class="spacer" alt="">
 
 <section class="booking-title-wrapper" style="background-image: url(<?php echo get_template_directory_uri();?>/images/mir/contact.png);">
@@ -33,7 +33,7 @@
 
 
 <!-- Вывод картинки в переменной
- Пишем php-код на странице где выводим картинку -->
+ Пишем php-код на странице где выводим картинку --> 
 <?php 
 	$banner = wp_get_attachment_image_src( carbon_get_the_post_meta('resort_banner'), 'full')[0];
 		if(empty($banner)) {
@@ -148,27 +148,90 @@ add_action('init', 'page_excerpt');
 		'container_class' => 'ul-clean','container' => false )); ?>
 
 <!-- Создание меню в файле functions.php -->
-add_action( 'after_setup_theme', function(){
-	register_nav_menus( [
-		'menu-1' => 'Меню Товары',
-		'menu-2' => 'Меню Сотрудничество',
-		'menu-3' => 'Меню Доставка',
-	] );
-} ); 
+add_action('after_setup_theme', function () {
+	register_nav_menus([
+		// 'menu_hot' => 'Меню актуальных предложений (рядом с каталогом)',
+		'menu_main' => 'Меню основное',
+		'menu_cat' => 'Меню каталог (в подвале)',
+		'menu_company' => 'Меню о компании (в подвале)',
+		// 'menu_corp' => 'Общекорпоративное меню (верхняя шапка)', 
+	]);
+});
 
-<!-- Добавляем свой класс к пункту меню в админке -->
-add_filter( 'nav_menu_css_class', 'change_menu_item_css_classes', 10, 4 );
 
-function change_menu_item_css_classes( $classes, $item, $args, $depth ) {
-  if( 3674 === $item->ID  && 'menu_main' === $args->theme_location ){
-    $classes[] = 'menu__catalogy';
-  }
+<!-- // Добавление стилей к пунктам меню li -->
+add_filter('nav_menu_css_class', 'change_menu_item_css_classes', 10, 4);
 
-  if( 3670 === $item->ID  && 'menu_main' === $args->theme_location ){
-    $classes[] = 'menu__shares';
-  }
+function change_menu_item_css_classes($classes, $item, $args, $depth)
+{
+	if ($item->ID  && 'menu_cat' === $args->theme_location) {
+		$classes[] = 'footer-top-wrap-list-item-sublist-item';
+	}
 
-  return $classes;
+	if ($item->ID  && 'menu_company' === $args->theme_location) {
+		$classes[] = 'footer-top-wrap-list-item-sublist-item';
+	}
+
+	if ($item->ID  && 'menu_main' === $args->theme_location) {
+		$classes[] = 'header-bottom-wrap-menu-item';
+	}
+
+	return $classes;
+}
+
+
+<!-- // Добавляет атрибут class к ссылке в пунктах меню menu_main -->
+add_filter('nav_menu_link_attributes', 'filter_nav_menu_link_attributes', 10, 4);
+function filter_nav_menu_link_attributes($atts, $item, $args, $depth)
+{
+	if (in_array($args->theme_location, ['menu_main'])) {
+		$atts['class'] = 'header-bottom-wrap-menu-item__link';
+
+		if ($item->current) {
+			$atts['class'] .= ' menu-link--active'; //активный пункт меню
+		}
+	}
+	return $atts;
+}
+
+
+<!-- // Добавляет иконку к ссылкам меню, прикрепленное к области меню menu_main -->
+function change_menu_item_args($args)
+{
+	if ($args->theme_location == 'menu_main') {
+		$args->link_after = '<img src="' . get_template_directory_uri() . '/img/home/header-menu-arrow-down.svg" alt="" class="header-bottom-wrap-menu-item-down__img">';
+	}
+
+	return $args;
+}
+add_filter('nav_menu_item_args', 'change_menu_item_args');
+
+
+<!-- // Добавляем класс к submenu, прикрепленное к области меню menu_main -->
+// add_filter('nav_menu_submenu_css_class', 'change_wp_nav_menu', 10, 3);
+
+// function change_wp_nav_menu($classes, $args, $depth)
+// {
+// 	if ($args->theme_location == 'menu_main') {
+// 		$classes[] = 'header-bottom-wrap-menu-item-submenu';
+// 		// $classes[] = 'my-css-2';
+// 	}
+
+// 	return $classes;
+// }
+
+<!-- // Изменить css класс submenu  -->
+add_filter('nav_menu_submenu_css_class', 'change_wp_nav_menu', 10, 3);
+
+function change_wp_nav_menu($classes, $args, $depth)
+{
+	foreach ($classes as $key => $class) {
+		if ($class == 'sub-menu') {
+			$classes[$key] = 'header-bottom-wrap-menu-item-submenu';
+		}
+	}
+
+	return $classes;
 }
 <!-- =========================================================================================================================================== -->
 
@@ -1459,4 +1522,23 @@ if ( ! empty( $terms ) && is_array( $terms ) ) {
 
 // Для управления интерфейсами, телефонами, текстовыми блоками и прочими блоками из админки,
 // ставим плагин Redux framework
+// ===========================================================================================================================================
+
+
+// Отправка страницы на печать
+<main onload="printit()" class="main">
+	Содержимое для печати
+</main>
+
+<a href="#" class="card-wrap-properties-links-link" onclick="printit()">Распечатать страницу</p></a>
+
+function printit() {
+	if (window.print) {
+		window.print();
+	} else {
+		var WebBrowser = '<OBJECT ID="WebBrowser1" WIDTH=0 HEIGHT=0 CLASSID="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2"></OBJECT>';
+		document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
+		WebBrowser1.ExecWB(6, 2);//Use a 1 vs. a 2 for a prompting dialog box WebBrowser1.outerHTML = ""; 
+	}
+}
 // ===========================================================================================================================================
