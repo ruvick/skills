@@ -124,6 +124,8 @@ add_action('init', 'page_excerpt');
 <!-- Вывод телефона из поля карбон -->
 <a href="tel:<? echo preg_replace('/[^0-9]/', '', $tel); ?>" class="contact-tel"><? echo $tel = carbon_get_theme_option("as_phones_1"); ?></a>
 
+<!-- Вывод из Настроек темы -->
+<?php echo carbon_get_theme_option('about_home_title'); ?>
 
 <!-- Вывод из текстового поля -->
 <p><?echo carbon_get_post_meta(get_the_ID(),"offer_smile_descr"); ?></p>
@@ -367,6 +369,56 @@ function wp_corenavi() {
 					wp_reset_postdata();
 	?>
 </div>
+
+<!-- Вывод дочерних таксономий конкретной таксономии -->
+<?
+$termID = 10; // get_queried_object()->term_id; - динамическое получение ID текущей рубрики
+$taxonomyName = "products";
+$termchildren = get_term_children( $termID, $taxonomyName );
+
+echo '<ul>';
+foreach ($termchildren as $child) {
+	$term = get_term_by( 'id', $child, $taxonomyName );
+	echo '<li><a href="' . get_term_link( $term->term_id, $term->taxonomy ) . '">' . $term->name . '</a></li>';
+}
+
+echo '</ul>';
+?>
+<!-- Ссылка -  https://wp-kama.ru/function/get_term_children -->
+
+
+<!-- Вывод дочерних таксономий находясь в основной таксономии. Так же выводим картинку таксономии и описание -->
+<?php
+	$terms = get_terms('ultracat');
+
+	if ($terms && !is_wp_error($terms)) {
+
+		foreach ($terms as $term) {
+
+			$term_id = $term->term_taxonomy_id;
+			// получим ID картинки из метаполя термина
+			$image_id = get_term_meta($term_id, '_thumbnail_id', 1);
+			// ссылка на полный размер картинки по ID вложения
+			$image_url = wp_get_attachment_image_url($image_id, 'full');
+			// Описание такосномии из админки
+			$description = term_description($term_id);
+
+			echo '<a href="' . get_term_link($term->term_id, $term->taxonomy) . '" class="catalog-list-item">
+						<img src="' . $image_url . '" alt="" class="catalog-list-item__img">
+						<div class="catalog-list-item-link">
+							<h3 class="catalog-list-item-link__title">' . $term->name . '</h3>
+						</div>
+						<p class="catalog-list-item__desc">' . $description . '</p>
+						<div class="catalog-list-item-link">
+							<p class="catalog-list-item-link__desc">Подробнее</p>
+							<img src="' . get_template_directory_uri() . '/img/home/header-arrow-right.svg" alt="" class="catalog-list-item-link__img">
+						</div>
+					</a>';
+			}
+		}
+?>
+<!-- Вывод описания категории из админки - https://wp-kama.ru/function/category_description/comment-page-1#comments-section -->
+<!-- Вывод описания таксономии из админки - https://wp-kama.ru/function/term_description -->
 <!-- =========================================================================================================================================== -->
 <!-- ТАКСОНОМИИ END =================================================================================================================================-->
 
@@ -478,6 +530,27 @@ function wp_corenavi() {
 ?>
 <!-- Ссылка - https://wp-kama.ru/question/pomogite-s-vyivodom-kategoriy -->
 <!-- =========================================================================================================================================== -->
+
+<!-- Выводим дочерние страницы конкретной страницы по ID -->
+<?php
+	$page_children = new WP_Query(
+		array(
+			'post_type' => 'page',
+			'post_parent' => '162',
+			'order'       => 'ASC',
+		)
+	);
+		if ($page_children->have_posts()) :
+			while ($page_children->have_posts()) : $page_children->the_post();
+?>
+	<li class="production-wrap-cards-hidden-list-item">
+		<a href="<?php the_permalink(); ?>" class="production-wrap-cards-hidden-list-item__link"><?php the_title(); ?></a>
+	</li>
+<?php
+		endwhile;
+		endif;
+	wp_reset_query();
+?>
 <!-- КАТЕГОРИИ END======================================================================================================================================-->
 
 
@@ -1506,7 +1579,7 @@ if ( ! empty( $terms ) && is_array( $terms ) ) {
 	$taxonomyName = "ultracat";
 	$termchildren = get_term_children( $termID, $taxonomyName );
 
-		foreach ($termchildren as $child) {
+		foreach ($termchildren as $child) { 
 			$term = get_term_by( 'id', $child, $taxonomyName );
 				echo '<a href="' . get_term_link( $term->term_id, $term->taxonomy ) . '" class="main-page__btn btn <?php echo $class; ?>">' . $term->name . '</a>';
 	}
