@@ -1,10 +1,10 @@
-<!-- Wordpress -->
+<!-- Wordpress --> 
 
 
-<!-- Подключение логотипа --> 
+<!-- Подключение логотипа -->  
 <?php bloginfo( 'name' ); ?> <!-- Подключение ссылки логотипа. Вставляем вместо Cлова-логотипа в ссылке. 
 	Чтобы клиент сам мог его менять из админки -->
-	<a href="#"><?php bloginfo( 'name' ); ?></a>
+	<a href="#"><?php bloginfo( 'name' ); ?></a> 
 	<!-- =========================================================================================================================================== -->
 
 
@@ -22,6 +22,11 @@
 	<a href="<?php echo get_permalink(25);?>">Смотреть квалификацию</a> <!-- Подключение страниц -->
 
 	<a href="<?php echo get_category_link(31);?>"> <!-- Подключение рубрик -->
+
+	<!-- Ссылка Скачать. Файл из комплексного поля -->
+	<?php
+    printf('<a href="%s" download class="product__card-btn btn">Скачать</a>', $item['cat_mat_file']);
+  ?>
 		<!-- =========================================================================================================================================== -->
 
 
@@ -45,6 +50,15 @@
 
 	<!-- Выводим картинку фоном в блоке -->
 	<div class="header-services__img" style="background-image: url(<?php echo $banner?>);"></div>
+
+	<!-- Выводим картинку категории из поля -->
+	<?php 
+		$thumbnail_id = carbon_get_term_meta( get_queried_object_id(),  'term_photo'); // получим ID картинки из опции темы
+		$thumbnail_url = wp_get_attachment_image_url( $thumbnail_id, 'full' );  // ссылка на полный размер картинки по ID вложения
+	?>
+		<div class="cat-content-img">
+			<img src="<?php echo $thumbnail_url; ?>" alt="" /> 
+		</div>
 	<!-- ============================================================================================================================================ -->
 
 
@@ -130,6 +144,9 @@
 	<!-- Вывод из текстового поля -->
 	<p><?echo carbon_get_post_meta(get_the_ID(),"offer_smile_descr"); ?></p>
 
+	<!-- Вывод описания категории -->
+	<?php echo category_description(); ?>
+
 	<!-- Если описание не заполненно, блок не выводится -->
 	<? $abouttc = carbon_get_post_meta(get_the_ID(), "about_text_center");
 	if (!empty($abouttc)) { ?>
@@ -147,7 +164,11 @@
 
 
 	<!-- КОМПЛЕКСНЫЕ ПОЛЯ -->
-	<? $team = carbon_get_theme_option('complex_team');
+	<? 
+		$team = carbon_get_theme_option('complex_team'); // Вывод из настроек темы
+	  $catMat = carbon_get_term_meta( get_queried_object_id(),  'cat_mat_complex'); // Вывод из категорий
+		$catMat = carbon_get_post_meta(get_the_ID(),"offer_smile_descr"); // Вывод из страницы или поста
+
 	if ($team) {
 		$teamIndex = 0;
 		foreach ($team as $item) {
