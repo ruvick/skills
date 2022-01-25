@@ -1,4 +1,4 @@
-<!-- =============================================================== Wordpress ============================================================================ -->
+<!-- =============================================================== WORDPRESS ============================================================================ -->
 
 
 <!-- ======================================================== ПОДКЛЮЧЕНИЯ, ССЫЛКИ ========================================================================= -->
@@ -31,6 +31,24 @@
 
 <!-- Скачать страницу в PDF  -->
 <a href="#" class="card-wrap-properties-links-link" onclick="generatePDF();">Скачать страницу в PDF</p></a>
+<!-- =================================== -->
+
+<!-- Отправка страницы на печать -->
+<main onload="printit()" class="main">
+	Содержимое для печати
+</main>
+
+<a href="#" class="card-wrap-properties-links-link" onclick="printit()">Распечатать страницу</p></a>
+
+function printit() {
+	if (window.print) {
+		window.print();
+	} else {
+		var WebBrowser = '<OBJECT ID="WebBrowser1" WIDTH=0 HEIGHT=0 CLASSID="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2"></OBJECT>';
+		document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
+		WebBrowser1.ExecWB(6, 2);//Use a 1 vs. a 2 for a prompting dialog box WebBrowser1.outerHTML = ""; 
+	}
+}
 <!-- ================================================================================================================================================== -->
 
 
@@ -472,12 +490,75 @@ add_action( 'wp_enqueue_scripts', 'my_styles_method' );
 <!-- =================================================================================================================================================== -->
 
 
+<!-- =============================================================== СТРАНИЦЫ ======================================================================== -->
 
-	<!-- Вывод инфоблока на определенной страничке, где 7 — id нужной страницы: -->
-	<?php if (is_page('7')) { ?>
-		<div class="name"> текст </div>
-	<?php } ?>
-	<!-- https://mihalica.ru/kak-dobavit-informatsionnyiy-blok-na-opredelyonnuyu-id-stranitsu/ -->
+<!-- Выводим дочерние страницы конкретной страницы по ID -->
+<?php
+$page_children = new WP_Query(
+	array(
+		'post_type' => 'page',
+		'post_parent' => '162',
+		'order'       => 'ASC',
+	)
+);
+if ($page_children->have_posts()) :
+	while ($page_children->have_posts()) : $page_children->the_post();
+		?>
+		<li class="production-wrap-cards-hidden-list-item">
+			<a href="<?php the_permalink(); ?>" class="production-wrap-cards-hidden-list-item__link"><?php the_title(); ?></a>
+		</li>
+		<?php
+	endwhile;
+endif;
+wp_reset_query();
+?>
+<!-- ============================== -->
+
+<!-- На основной странице выводим дочерние страницы с Заголовками, ссылками и картинками. Указываем ID Основной страницы и выводим колиичество дочерних страниц -->
+	<?php $stati_children = new WP_Query(array(
+		'post_type' => 'page',
+		'order'       => 'ASC',
+		'post_parent' => get_the_ID()
+	)
+);
+
+	if($stati_children->have_posts()) :
+		while($stati_children->have_posts()): $stati_children->the_post();
+			echo '
+			<div class="news-item">
+			<a href="'.get_the_permalink().'" class="news-item__img news-item__img-work" style="background-image: url( '.get_the_post_thumbnail_url( get_the_id(), 'full' ).' )"></a>
+			<div class="news-item__title">'.get_the_title().'</div>
+			<div class="news-item__text"><?php echo the_excerpt();?></div>
+			<div class="btn-wrap">
+			<a href="'.get_the_permalink().'" class="button">Подробнее</a>
+			<a href="#" class="button heating-card__btn" data-title="<?php the_title();?>">Узнать цену</a>
+			</div>
+			</div>';
+		endwhile;
+	endif; wp_reset_query();
+	?>
+<!-- ============================== -->
+
+<!-- Вывод инфоблока на определенной страничке, где 7 — id нужной страницы: -->
+<?php if (is_page('7')) { ?>
+	<div class="name"> текст </div>
+<?php } ?>
+<!-- https://mihalica.ru/kak-dobavit-informatsionnyiy-blok-na-opredelyonnuyu-id-stranitsu/ -->
+<!-- ============================== -->
+
+<!-- // Выводим страницу по ключу https://bestatmosfera.ru/?show=1 -->
+<? if (empty($_REQUEST["show"])) {?>
+	<main class="page">	
+		<section id="about-full" class="about-full">
+			<div class="container">
+				<div class="about-full__img">
+					<img src="<?php echo get_template_directory_uri();?>/img/logo.svg" alt="">
+					<h1>Сайт в разработке!</h1>
+				</div>
+			</div>
+		</section>  
+	</main>
+<? } else { ?>
 <!-- =================================================================================================================================================== -->
 
 
@@ -506,7 +587,6 @@ add_action( 'wp_enqueue_scripts', 'my_styles_method' );
 <!-- ============================== -->
 
 <!-- Вывод определенных записией в любом месте -->
-<!-- https://wp-kama.ru/function/get_posts#include -->
 <?php 
 $posts = get_posts( array(
 	'numberposts' => 3,
@@ -544,8 +624,7 @@ foreach( $posts as $post ){
 	<?php 
 } 
 ?>
-
-<?php the_excerpt(); ?> - настраиваемая функция
+<!-- https://wp-kama.ru/function/get_posts#include -->
 <!-- ============================ -->
 
 <!-- Выводим в Основной рубрике ее дочерние рубрики с их записями и картинками -->
@@ -587,28 +666,6 @@ if ($sub_cats) {
 } 
 ?>
 <!-- Ссылка - https://wp-kama.ru/question/pomogite-s-vyivodom-kategoriy -->
-<!-- ============================ -->
-
-<!-- Выводим дочерние страницы конкретной страницы по ID -->
-<?php
-$page_children = new WP_Query(
-	array(
-		'post_type' => 'page',
-		'post_parent' => '162',
-		'order'       => 'ASC',
-	)
-);
-if ($page_children->have_posts()) :
-	while ($page_children->have_posts()) : $page_children->the_post();
-		?>
-		<li class="production-wrap-cards-hidden-list-item">
-			<a href="<?php the_permalink(); ?>" class="production-wrap-cards-hidden-list-item__link"><?php the_title(); ?></a>
-		</li>
-		<?php
-	endwhile;
-endif;
-wp_reset_query();
-?>
 <!-- ============================ -->
 
 	<!-- В категории выводим посты прикремленные к ней в конкретном html коде. Картинки и нумерацию выводим из карбон полей постов из комплексного поля, через переменную. -->
@@ -663,6 +720,7 @@ wp_reset_query();
 		wp_reset_postdata();
 		?>
 	</div>
+<!-- =================================== -->
 
 	<!-- И еще пример -->
 	<?
@@ -685,6 +743,7 @@ wp_reset_query();
 	}  
 	wp_reset_postdata();
 	?>
+<!-- =================================== -->
 
 	<!-- Все посты из таксономии ultracat -->
 	<div class="prod-card d-flex">
@@ -708,6 +767,7 @@ wp_reset_query();
 		wp_reset_postdata();
 		?>
 	</div>
+<!-- =================================== -->
 
 	<!-- Вывод дочерних таксономий конкретной таксономии -->
 	<?
@@ -724,7 +784,7 @@ foreach ($termchildren as $child) {
 echo '</ul>';
 ?>
 <!-- Ссылка -  https://wp-kama.ru/function/get_term_children -->
-
+<!-- =================================== -->
 
 <!-- Вывод дочерних таксономий находясь в основной таксономии. Так же выводим картинку таксономии и описание -->
 <?php
@@ -758,6 +818,7 @@ if ($terms && !is_wp_error($terms)) {
 ?>
 <!-- Вывод описания категории из админки - https://wp-kama.ru/function/category_description/comment-page-1#comments-section -->
 <!-- Вывод описания таксономии из админки - https://wp-kama.ru/function/term_description -->
+<!-- =================================== --> 
 
 <!-- Выводим товары рандомно -->
 <?
@@ -781,241 +842,105 @@ if ($terms && !is_wp_error($terms)) {
 			}  
 				wp_reset_postdata(); 
 	?>
-<!-- =================================================================================================================================================== -->
-
-
-<!-- ========================================================== ИНТЕРНЕТ-МАГАЗИН ======================================================================= -->
-
-<!-- Карточка товара -->
-
 <!-- =================================== -->
 
-<!-- Кнопка добавления в корзину, на стр Товара -->
-<button class="card__bascet button" id = "btn__to-card" onclick = "add_tocart(this, document.getElementById('pageNumeric').value); return false;"
-  data-price = "<?echo carbon_get_post_meta(get_the_ID(),"offer_price"); ?>"
-	data-sku = "<? echo carbon_get_post_meta(get_the_ID(),"offer_sku")?>"
-	data-size = ""
-  data-oldprice = "<? echo carbon_get_post_meta(get_the_ID(),"offer_old_price")?>"
-  data-lnk = "<? echo  get_the_permalink(get_the_ID());?>"
-  data-name = "<? echo  get_the_title();?>"
-  data-count = "1"
-  data-picture = "<?php  $imgTm = get_the_post_thumbnail_url( get_the_ID(), "tominiatyre" ); echo empty($imgTm)?get_bloginfo("template_url")."/img/no-photo.jpg":$imgTm; ?>" >
-    В корзину
-</button>
-<!-- =================================================================================================================================================== -->
-
-
-<!-- =============================================================== МЕНЮ ИЗ АДМИНКИ ==================================================================================== -->
-
-<!-- В html файле вставляем вместо сверстанного меню код. Три разных меню. Создаются в файле functions.php -->
-<?php wp_nav_menu( array('theme_location' => 'menu-1','menu_class' => 'ul-clean',
-	'container_class' => 'ul-clean','container' => false )); ?> 
-
-<?php wp_nav_menu( array('theme_location' => 'menu-2','menu_class' => 'ul-clean',
-	'container_class' => 'ul-clean','container' => false )); ?>
-
-<?php wp_nav_menu( array('theme_location' => 'menu-3','menu_class' => 'ul-clean',
-	'container_class' => 'ul-clean','container' => false )); ?>
-
-<!-- Создание меню в файле functions.php -->
-<?php
-	add_action('after_setup_theme', function () {
-		register_nav_menus([
-		// 'menu_hot' => 'Меню актуальных предложений (рядом с каталогом)',
-		'menu_main' => 'Меню основное',
-		'menu_cat' => 'Меню каталог (в подвале)',
-		'menu_company' => 'Меню о компании (в подвале)',
-		// 'menu_corp' => 'Общекорпоративное меню (верхняя шапка)', 
-		]);
-	});
-	<!-- =================================== -->
-
-	<!-- // Добавление стилей к пунктам меню li -->
-	add_filter('nav_menu_css_class', 'change_menu_item_css_classes', 10, 4);
-
-	function change_menu_item_css_classes($classes, $item, $args, $depth)
-	{
-		if ($item->ID  && 'menu_cat' === $args->theme_location) {
-			$classes[] = 'footer-top-wrap-list-item-sublist-item';
+<!-- Находясь в конкретной таксономии, выводим ее дочернии таксономии -->
+<div class="main-page__filter d-flex">
+	<?php $termID =  get_queried_object()->term_id;// - динамическое получение ID текущей рубрики
+		$taxonomyName = "ultracat";
+		$termchildren = get_term_children( $termID, $taxonomyName );
+			foreach ($termchildren as $child) { 
+		$term = get_term_by( 'id', $child, $taxonomyName );
+			echo '<a href="' . get_term_link( $term->term_id, $term->taxonomy ) . '" class="main-page__btn btn <?php echo $class; ?>">' . $term->name . '</a>';
 		}
+	?>
+</div>
+<!-- =================================== -->
 
-		if ($item->ID  && 'menu_company' === $args->theme_location) {
-			$classes[] = 'footer-top-wrap-list-item-sublist-item';
+<!-- Выводим дочерние категории кастомной таксономии -->
+		<?php
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'ultracat',
+				'hide_empty' => true,
+				'pad_counts'  => true,
+				'orderby' => 'count',
+				'order' => 'DESC',
+			)
+		);
+
+		if ( ! empty( $terms ) && is_array( $terms ) ) {
+			echo '<ul class="list-my_taxonomy">';
+			foreach ( $terms as $term ) { ?>
+				<li>
+					<a href="<?php echo esc_url( get_term_link( $term ) ) ?>">
+						<?php echo $term->name; ?> (<?php echo $term->count; ?>)
+					</a>
+				</li>
+				<?php
+			}
+			echo '</ul>';
 		}
+		?>
+<!-- =================================== -->
 
-		if ($item->ID  && 'menu_main' === $args->theme_location) {
-			$classes[] = 'header-bottom-wrap-menu-item';
+		<!-- Тоже самое только с подсветкой выбранного пункта -->
+		<?php
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'my_taxonomy',
+				'hide_empty' => true,
+				'pad_counts'  => true,
+				'orderby' => 'count',
+				'order' => 'DESC',
+			)
+		);
+
+		if ( ! empty( $terms ) && is_array( $terms ) ) {
+			echo '<ul class="sidebar-offer_cat">';
+			foreach ( $terms as $term ) {
+				$curTerm = $wp_query->queried_object;
+				$class = ( $term->name == $curTerm->name ) ? 'active' : '';
+				?>
+
+				<li class="<?php echo $class; ?>">
+					<a href="<?php echo esc_url( get_term_link( $term ) ) ?>">
+						<?php echo $term->name; ?>
+					</a>
+				</li>
+
+				<?php
+			}
+			echo '</ul>';
 		}
+		?>
+<!-- =================================== -->
 
-		return $classes;
-	}
-	<!-- =================================== -->
+		<!-- Выводим дочерние категории конкретной кастомной таксономии -->
+		<?php
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'ultracat',
+				'child_of' => 13,
+				'hide_empty' => true,
+				'pad_counts'  => true, 
+				'orderby' => 'count',
+				'order' => 'ASC',
+			)
+		);
 
-	<!-- // Добавляет атрибут class к ссылке в пунктах меню menu_main -->
-	add_filter('nav_menu_link_attributes', 'filter_nav_menu_link_attributes', 10, 4);
-	function filter_nav_menu_link_attributes($atts, $item, $args, $depth)
-	{
-		if (in_array($args->theme_location, ['menu_main'])) {
-			$atts['class'] = 'header-bottom-wrap-menu-item__link';
-
-			if ($item->current) {
-				$atts['class'] .= ' menu-link--active'; //активный пункт меню
+		if ( ! empty( $terms ) && is_array( $terms ) ) {
+			foreach ( $terms as $term ) { ?>
+				<li>
+					<a href="<?php echo esc_url( get_term_link( $term ) ) ?>">
+						<?php echo $term->name; ?>
+					</a>
+				</li>
+				<?php
 			}
 		}
-		return $atts;
-	}
-	<!-- =================================== -->
-
-	<!-- // Добавляет иконку к ссылкам меню, прикрепленное к области меню menu_main -->
-	function change_menu_item_args($args)
-	{
-		if ($args->theme_location == 'menu_main') {
-			$args->link_after = '<img src="' . get_template_directory_uri() . '/img/home/header-menu-arrow-down.svg" alt="" class="header-bottom-wrap-menu-item-down__img">';
-		}
-
-		return $args;
-	}
-	add_filter('nav_menu_item_args', 'change_menu_item_args');
-
-
-	<!-- // Добавляем класс к submenu, прикрепленное к области меню menu_main -->
-	// add_filter('nav_menu_submenu_css_class', 'change_wp_nav_menu', 10, 3);
-
-	// function change_wp_nav_menu($classes, $args, $depth)
-	// {
-		// 	if ($args->theme_location == 'menu_main') {
-			// 		$classes[] = 'header-bottom-wrap-menu-item-submenu';
-			// 		// $classes[] = 'my-css-2';
-			// 	}
-
-			// 	return $classes;
-			// }
-
-			<!-- // Изменить css класс submenu  -->
-			add_filter('nav_menu_submenu_css_class', 'change_wp_nav_menu', 10, 3);
-
-			function change_wp_nav_menu($classes, $args, $depth)
-			{
-				foreach ($classes as $key => $class) {
-					if ($class == 'sub-menu') {
-						$classes[$key] = 'header-bottom-wrap-menu-item-submenu';
-					}
-				}
-
-				return $classes;
-			}
-?>
-
-<!-- Выводим в пунктах меню заголовки постов -->
-<ul class="galery-block__menu menu-galery">
-	<?php
-		global $post;
-	$args = array( 'numberposts' => -1, 'order' => 'ASC', 'offset'=> 1, 'category' => 21 );
-	$myposts = get_posts( $args );
-		foreach( $myposts as $post ){
-			setup_postdata($post);
-	?>
-		<li><a href="<?php the_permalink(); ?>" 
-			class="menu-galery__link"><?php the_title(); ?> (<?php echo carbon_get_post_meta(get_the_ID(),"number_img"); ?>)</a></li>
-	<?php 
-		}
-		wp_reset_postdata();
-	?>
-</ul>
-<!-- =================================================================================================================================================== -->
-
-
-<!-- ========================================================== JQUERRY ========================================================================================= -->
-
-
-<!-- Добавляем класс active к выбранному пункту меню -->
-$(".menu-galery li a").click(function (e) {
-	e.preventDefault();
-	$(".menu-galery li a").removeClass('active');
-		$(this).addClass('active');
-})
+		?>
 <!-- =================================== -->
-
-<!-- Вывод блока. Один показываем, другой скрываем -->
-	jqXHR.done(function (responce) {
-		jQuery(".headen_form_blk, .newButton").hide();
-		jQuery('.SendetMsg').show();
-	});
-<!-- =================================== -->
-
-<!-- Разные скрипты Slick слайдера -->
-// $(window).on('resize orientationchange', function () {
-	// 	$('.galary-sl-big').slick('resize');
-	// 	$('.galary-sl-small').slick('resize');
-	// 	$('.galary-sl-big').slick('setPosition');
-	// 	$('.galary-sl-small').slick('setPosition');
-// });
-
-// $('.galary-sl-small').slick('setPosition');
-
-// $(document).ready(function () {
-	// 	var slider = $('.galary-sl-big').slick({
-		// todo
-// 	});
-
-// 	slider.slick('reinit');
-// });
-
-// $(window).on('resize orientationchange', function () {
-		// 	$('.galary-sl-big').slick('resize');
-		// 	$('.galary-sl-small').slick('resize');
-// });
-
-// $(window).on('resize', function () {
-	// 	$('.galary-sl-big').slick('resize');
-	// 	$('.galary-sl-small').slick('resize');
-	// alert('window was resized!');
-// });
-
-// $(".slider.slick-initialized").slick('reinit');
-// $(".slider:not(.slick-initialized)").slick(config);
-<!-- =================================== -->
-
-<!-- Подключение галерии Lihtbox -->
-	$('figure img').parent('a').attr("data-lightbox", 'gallery');
-<!-- ============================================================================================================================================ -->
-
-
-
-<!-- На основной странице выводим дочерние страницы с Заголовками, ссылками и картинками. Указываем ID Основной страницы 
-	и выводим колиичество дочерних страниц -->
-	<?php $stati_children = new WP_Query(array(
-		'post_type' => 'page',
-		'order'       => 'ASC',
-		'post_parent' => get_the_ID()
-	)
-);
-
-	if($stati_children->have_posts()) :
-		while($stati_children->have_posts()): $stati_children->the_post();
-			echo '
-			<div class="news-item">
-			<a href="'.get_the_permalink().'" class="news-item__img news-item__img-work" style="background-image: url( '.get_the_post_thumbnail_url( get_the_id(), 'full' ).' )"></a>
-			<div class="news-item__title">'.get_the_title().'</div>
-			<div class="news-item__text"><?php echo the_excerpt();?></div>
-			<div class="btn-wrap">
-			<a href="'.get_the_permalink().'" class="button">Подробнее</a>
-			<a href="#" class="button heating-card__btn" data-title="<?php the_title();?>">Узнать цену</a>
-			</div>
-			</div>';
-		endwhile;
-	endif; wp_reset_query();
-	?>
-	<!-- ============================================================================================================================================ -->
-
-
-
-	<!-- У ссылок у которых в href только # без id их не окрашиваем, то есть не выделяем -->
-	a[href^="#"]:not(a[href="#"]) {
-		bacground: red;
-	}
-	<!-- ============================================================================================================================================ -->
-
 
 	<!-- Выводим в главной таксномии Продукты все остальные таксномии -->
 	<div class="archive-prod-card galery-block__galery-row prod-card">
@@ -1026,11 +951,11 @@ $(".menu-galery li a").click(function (e) {
 
 			foreach( $terms as $term ) {
 
-				$term_id = $term->term_taxonomy_id; - Выводим картинку прикрепленную в дочернюю таксономию
+				$term_id = $term->term_taxonomy_id; // Выводим картинку прикрепленную в дочернюю таксономию
 						// получим ID картинки из метаполя термина
-				$image_id = get_term_meta( $term_id, '_thumbnail_id', 1 ); - Выводим картинку прикрепленную в дочернюю таксономию
+				$image_id = get_term_meta( $term_id, '_thumbnail_id', 1 ); // Выводим картинку прикрепленную в дочернюю таксономию
 						// ссылка на полный размер картинки по ID вложения
-				$image_url = wp_get_attachment_image_url( $image_id, 'full' ); - Выводим картинку прикрепленную в дочернюю таксономию
+				$image_url = wp_get_attachment_image_url( $image_id, 'full' ); // Выводим картинку прикрепленную в дочернюю таксономию
 
 				echo "<a href='". get_term_link( $term->term_id, $term->taxonomy ) ."' class='galery-block__galery-img'>
 				<img src = '" . $image_url . "' /> - Выводим картинку прикрепленную в дочернюю таксономию
@@ -1044,6 +969,7 @@ $(".menu-galery li a").click(function (e) {
 		}
 		?>
 	</div>
+
 
 	<!-- Чтобы в категориях и таксономиях появилась возможность добавления картинки, в файле function.php пишем след код. -->
 	/**
@@ -1261,142 +1187,211 @@ $(".menu-galery li a").click(function (e) {
 
 			}
 		}
-// ============================================================================================================================================
+	?>
+<!-- =================================================================================================================================================== -->
 
-// Выводим дочерние категории кастомной таксономии
-		<?php
-		$terms = get_terms(
-			array(
-				'taxonomy'   => 'ultracat',
-				'hide_empty' => true,
-				'pad_counts'  => true,
-				'orderby' => 'count',
-				'order' => 'DESC',
-			)
-		);
 
-		if ( ! empty( $terms ) && is_array( $terms ) ) {
-			echo '<ul class="list-my_taxonomy">';
-			foreach ( $terms as $term ) { ?>
-				<li>
-					<a href="<?php echo esc_url( get_term_link( $term ) ) ?>">
-						<?php echo $term->name; ?> (<?php echo $term->count; ?>)
-					</a>
-				</li>
-				<?php
-			}
-			echo '</ul>';
+<!-- ========================================================== ИНТЕРНЕТ-МАГАЗИН ======================================================================= -->
+
+<!-- Карточка товара -->
+
+<!-- =================================== -->
+
+<!-- Кнопка добавления в корзину, на стр Товара -->
+<button class="card__bascet button" id = "btn__to-card" onclick = "add_tocart(this, document.getElementById('pageNumeric').value); return false;"
+  data-price = "<?echo carbon_get_post_meta(get_the_ID(),"offer_price"); ?>"
+	data-sku = "<? echo carbon_get_post_meta(get_the_ID(),"offer_sku")?>"
+	data-size = ""
+  data-oldprice = "<? echo carbon_get_post_meta(get_the_ID(),"offer_old_price")?>"
+  data-lnk = "<? echo  get_the_permalink(get_the_ID());?>"
+  data-name = "<? echo  get_the_title();?>"
+  data-count = "1"
+  data-picture = "<?php  $imgTm = get_the_post_thumbnail_url( get_the_ID(), "tominiatyre" ); echo empty($imgTm)?get_bloginfo("template_url")."/img/no-photo.jpg":$imgTm; ?>" >
+    В корзину
+</button>
+<!-- =================================================================================================================================================== -->
+
+
+<!-- =============================================================== МЕНЮ ИЗ АДМИНКИ ==================================================================================== -->
+
+<!-- В html файле вставляем вместо сверстанного меню код. Три разных меню. Создаются в файле functions.php -->
+<?php wp_nav_menu( array('theme_location' => 'menu-1','menu_class' => 'ul-clean',
+	'container_class' => 'ul-clean','container' => false )); ?> 
+
+<?php wp_nav_menu( array('theme_location' => 'menu-2','menu_class' => 'ul-clean',
+	'container_class' => 'ul-clean','container' => false )); ?>
+
+<?php wp_nav_menu( array('theme_location' => 'menu-3','menu_class' => 'ul-clean',
+	'container_class' => 'ul-clean','container' => false )); ?>
+
+<!-- Создание меню в файле functions.php -->
+<?php
+	add_action('after_setup_theme', function () {
+		register_nav_menus([
+		// 'menu_hot' => 'Меню актуальных предложений (рядом с каталогом)',
+		'menu_main' => 'Меню основное',
+		'menu_cat' => 'Меню каталог (в подвале)',
+		'menu_company' => 'Меню о компании (в подвале)',
+		// 'menu_corp' => 'Общекорпоративное меню (верхняя шапка)', 
+		]);
+	});
+	<!-- =================================== -->
+
+	<!-- // Добавление стилей к пунктам меню li -->
+	add_filter('nav_menu_css_class', 'change_menu_item_css_classes', 10, 4);
+
+	function change_menu_item_css_classes($classes, $item, $args, $depth)
+	{
+		if ($item->ID  && 'menu_cat' === $args->theme_location) {
+			$classes[] = 'footer-top-wrap-list-item-sublist-item';
 		}
-		?>
 
-		<!-- Тоже самое только с подсветкой выбранного пункта -->
-		<?php
-		$terms = get_terms(
-			array(
-				'taxonomy'   => 'my_taxonomy',
-				'hide_empty' => true,
-				'pad_counts'  => true,
-				'orderby' => 'count',
-				'order' => 'DESC',
-			)
-		);
-
-		if ( ! empty( $terms ) && is_array( $terms ) ) {
-			echo '<ul class="sidebar-offer_cat">';
-			foreach ( $terms as $term ) {
-				$curTerm = $wp_query->queried_object;
-				$class = ( $term->name == $curTerm->name ) ? 'active' : '';
-				?>
-
-				<li class="<?php echo $class; ?>">
-					<a href="<?php echo esc_url( get_term_link( $term ) ) ?>">
-						<?php echo $term->name; ?>
-					</a>
-				</li>
-
-				<?php
-			}
-			echo '</ul>';
+		if ($item->ID  && 'menu_company' === $args->theme_location) {
+			$classes[] = 'footer-top-wrap-list-item-sublist-item';
 		}
-		?>
 
-		<!-- Выводим дочерние категории конкретной кастомной таксономии -->
-		<?php
-		$terms = get_terms(
-			array(
-				'taxonomy'   => 'ultracat',
-				'child_of' => 13,
-				'hide_empty' => true,
-				'pad_counts'  => true, 
-				'orderby' => 'count',
-				'order' => 'ASC',
-			)
-		);
-
-		if ( ! empty( $terms ) && is_array( $terms ) ) {
-			foreach ( $terms as $term ) { ?>
-				<li>
-					<a href="<?php echo esc_url( get_term_link( $term ) ) ?>">
-						<?php echo $term->name; ?>
-					</a>
-				</li>
-				<?php
-			}
+		if ($item->ID  && 'menu_main' === $args->theme_location) {
+			$classes[] = 'header-bottom-wrap-menu-item';
 		}
-		?>
-		<!-- ============================================================================================================================================ -->
 
-		<!-- Находясь в конкретной таксономии, выводим ее дочернии таксономии -->
-		<div class="main-page__filter d-flex">
-<?php $termID =  get_queried_object()->term_id;// - динамическое получение ID текущей рубрики
-$taxonomyName = "ultracat";
-$termchildren = get_term_children( $termID, $taxonomyName );
-
-foreach ($termchildren as $child) { 
-	$term = get_term_by( 'id', $child, $taxonomyName );
-	echo '<a href="' . get_term_link( $term->term_id, $term->taxonomy ) . '" class="main-page__btn btn <?php echo $class; ?>">' . $term->name . '</a>';
-}
-
-?>
-</div>
-<!-- ============================================================================================================================================ -->
-
-
-
-<!-- Отправка страницы на печать -->
-<main onload="printit()" class="main">
-	Содержимое для печати
-</main>
-
-<a href="#" class="card-wrap-properties-links-link" onclick="printit()">Распечатать страницу</p></a>
-
-function printit() {
-	if (window.print) {
-		window.print();
-	} else {
-		var WebBrowser = '<OBJECT ID="WebBrowser1" WIDTH=0 HEIGHT=0 CLASSID="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2"></OBJECT>';
-		document.body.insertAdjacentHTML('beforeEnd', WebBrowser);
-		WebBrowser1.ExecWB(6, 2);//Use a 1 vs. a 2 for a prompting dialog box WebBrowser1.outerHTML = ""; 
+		return $classes;
 	}
+	<!-- =================================== -->
+
+	<!-- // Добавляет атрибут class к ссылке в пунктах меню menu_main -->
+	add_filter('nav_menu_link_attributes', 'filter_nav_menu_link_attributes', 10, 4);
+	function filter_nav_menu_link_attributes($atts, $item, $args, $depth)
+	{
+		if (in_array($args->theme_location, ['menu_main'])) {
+			$atts['class'] = 'header-bottom-wrap-menu-item__link';
+
+			if ($item->current) {
+				$atts['class'] .= ' menu-link--active'; //активный пункт меню
+			}
+		}
+		return $atts;
+	}
+	<!-- =================================== -->
+
+	<!-- // Добавляет иконку к ссылкам меню, прикрепленное к области меню menu_main -->
+	function change_menu_item_args($args)
+	{
+		if ($args->theme_location == 'menu_main') {
+			$args->link_after = '<img src="' . get_template_directory_uri() . '/img/home/header-menu-arrow-down.svg" alt="" class="header-bottom-wrap-menu-item-down__img">';
+		}
+
+		return $args;
+	}
+	add_filter('nav_menu_item_args', 'change_menu_item_args');
+
+
+	<!-- // Добавляем класс к submenu, прикрепленное к области меню menu_main -->
+	// add_filter('nav_menu_submenu_css_class', 'change_wp_nav_menu', 10, 3);
+
+	// function change_wp_nav_menu($classes, $args, $depth)
+	// {
+		// 	if ($args->theme_location == 'menu_main') {
+			// 		$classes[] = 'header-bottom-wrap-menu-item-submenu';
+			// 		// $classes[] = 'my-css-2';
+			// 	}
+
+			// 	return $classes;
+			// }
+
+			<!-- // Изменить css класс submenu  -->
+			add_filter('nav_menu_submenu_css_class', 'change_wp_nav_menu', 10, 3);
+
+			function change_wp_nav_menu($classes, $args, $depth)
+			{
+				foreach ($classes as $key => $class) {
+					if ($class == 'sub-menu') {
+						$classes[$key] = 'header-bottom-wrap-menu-item-submenu';
+					}
+				}
+
+				return $classes;
+			}
+?>
+
+<!-- Выводим в пунктах меню заголовки постов -->
+<ul class="galery-block__menu menu-galery">
+	<?php
+		global $post;
+	$args = array( 'numberposts' => -1, 'order' => 'ASC', 'offset'=> 1, 'category' => 21 );
+	$myposts = get_posts( $args );
+		foreach( $myposts as $post ){
+			setup_postdata($post);
+	?>
+		<li><a href="<?php the_permalink(); ?>" 
+			class="menu-galery__link"><?php the_title(); ?> (<?php echo carbon_get_post_meta(get_the_ID(),"number_img"); ?>)</a></li>
+	<?php 
+		}
+		wp_reset_postdata();
+	?>
+</ul>
+<!-- =================================================================================================================================================== -->
+
+
+<!-- ========================================================== JQUERRY ========================================================================================= -->
+
+<script>
+<!-- Добавляем класс active к выбранному пункту меню -->
+$(".menu-galery li a").click(function (e) {
+	e.preventDefault();
+	$(".menu-galery li a").removeClass('active');
+		$(this).addClass('active');
+})
+<!-- =================================== -->
+
+<!-- Вывод блока. Один показываем, другой скрываем -->
+	jqXHR.done(function (responce) {
+		jQuery(".headen_form_blk, .newButton").hide();
+		jQuery('.SendetMsg').show();
+	});
+<!-- =================================== -->
+
+<!-- Разные скрипты Slick слайдера -->
+// $(window).on('resize orientationchange', function () {
+	// 	$('.galary-sl-big').slick('resize');
+	// 	$('.galary-sl-small').slick('resize');
+	// 	$('.galary-sl-big').slick('setPosition');
+	// 	$('.galary-sl-small').slick('setPosition');
+// });
+
+// $('.galary-sl-small').slick('setPosition');
+
+// $(document).ready(function () {
+	// 	var slider = $('.galary-sl-big').slick({
+		// todo
+// 	});
+
+// 	slider.slick('reinit');
+// });
+
+// $(window).on('resize orientationchange', function () {
+		// 	$('.galary-sl-big').slick('resize');
+		// 	$('.galary-sl-small').slick('resize');
+// });
+
+// $(window).on('resize', function () {
+	// 	$('.galary-sl-big').slick('resize');
+	// 	$('.galary-sl-small').slick('resize');
+	// alert('window was resized!');
+// });
+
+// $(".slider.slick-initialized").slick('reinit');
+// $(".slider:not(.slick-initialized)").slick(config);
+<!-- =================================== -->
+
+<!-- Подключение галерии Lihtbox -->
+	$('figure img').parent('a').attr("data-lightbox", 'gallery');
+<!-- =================================== -->
+
+<!-- У ссылок у которых в href только # без id их не окрашиваем, то есть не выделяем -->
+a[href^="#"]:not(a[href="#"]) {
+	bacground: red;
 }
-<!-- =========================================================================================================================================== -->
-
-// Выводим страницу по ключу https://bestatmosfera.ru/?show=1
-<? if (empty($_REQUEST["show"])) {?>
-	<main class="page">	
-		<section id="about-full" class="about-full">
-			<div class="container">
-				<div class="about-full__img">
-					<img src="<?php echo get_template_directory_uri();?>/img/logo.svg" alt="">
-					<h1>Сайт в разработке!</h1>
-				</div>
-			</div>
-		</section>  
-	</main>
-
-<? } else { ?>
-	<!-- =========================================================================================================================================== -->
-
+</script>
 
 	<!-- Отправка файла на почту -->
 	<!-- Обязательно создаем папку uploads !!!-->
@@ -1502,4 +1497,4 @@ add_action( 'wp_ajax_nopriv_sendproject', 'sendproject' );
   }
 
   ?>
-	<!-- =========================================================================================================================================== -->
+	<!-- ================================================================================================================================================= -->
