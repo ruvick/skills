@@ -427,6 +427,40 @@ add_action( 'wp_enqueue_scripts', 'my_styles_method' );
 			?>
 		</div>
 	<? } ?>
+
+<!-- =================================== -->
+
+<!-- Если в поле ничего не заполненно, не выволим блок -->
+<? $tarif = carbon_get_post_meta(get_the_ID(),"tariff_complex");	
+	  if (!empty($tarif)) { 
+?>
+  <h2 class="security__title title">Тарифные планы</h2> 
+  <div class="tariff-plans__wrap">
+<?
+  $tarifIndex = 0;
+		foreach ($tarif as $item) {
+?>
+  <div class="tariff-plans__column">
+    <div class="tariff-plans__card">
+      <div class="tariff-plans__card-header">
+        <h4 class="tariff-plans__card-header-title"><? echo $item['tariff_complex_name']; ?></h4>
+      </div>
+      <div class="tariff-plans__card-descp">
+      	<p class="tariff-plans__card-descp-price">от <span><? echo $item['tariff_complex_price']; ?></span> ₽/мес.</p>
+        <p class="tariff-plans__card-descp-text"><? echo $item['tariff_complex_descp']; ?></p>
+      </div>
+      <div class="tariff-plans__card-btn">
+        <div class="tariff-plans__card-btn-line"></div>
+          <a href="#callback" class="tariff-plans__card-btn-link btn _popup-link">Задать вопрос</a>
+        </div>
+        </div>
+      </div>
+<?
+	$tarifIndex++; 
+		}
+	}
+?>
+</div>
 <!-- =================================================================================================================================================== -->
 
 
