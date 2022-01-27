@@ -93,6 +93,12 @@ function printit() {
 	</div>
 <!-- =================================== -->
 
+<!-- Выводим картинку поста -->
+<picture>
+	<?php echo get_the_post_thumbnail( $post->ID, "turImg", array("alt" => $post->post_title, "title" => $post->post_title));?>
+</picture>
+<!-- =================================== -->
+
 <!-- Добавляем разные фишки к выводу изображений. Превьюшки и т.д.-->
 <!-- Ссылка - https://wp-kama.ru/function/add_theme_support -->
 	add_theme_support()
