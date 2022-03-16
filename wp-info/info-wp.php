@@ -1,5 +1,6 @@
 <!-- =============================================================== WORDPRESS ============================================================================ -->
 
+<?php echo get_post_type_archive_link('asgproduct');?>
 
 <!-- ======================================================== ПОДКЛЮЧЕНИЯ, ССЫЛКИ ========================================================================= -->
 
@@ -58,7 +59,7 @@ function printit() {
 <!-- Вставляем вместо Cлова-логотипа в ссылке. Чтобы клиент сам мог его менять из админки -->
 <a href="#"><?php bloginfo( 'name' ); ?></a> 
 <!-- =================================== -->
-
+ 
 <!-- Подключение картинок --> 
 <img src="<?php echo get_template_directory_uri();?>/images/bus-card.jpg" class="spacer" alt="">
 
@@ -141,6 +142,9 @@ function printit() {
 <!-- Вывод Заголовка категорий из админки -->
 <h1><? single_cat_title(); ?></h1>
 <!-- =================================== -->
+
+<!-- Вывод Заголовка категорий Товаров из админки -->
+<h1><?php single_cat_title( '', true );?></h1>
 
 <!-- Вывод описания страницы из админки --> 
 <p><?php the_content(); ?></p>
@@ -491,6 +495,26 @@ add_action( 'wp_enqueue_scripts', 'my_styles_method' );
 ?>
 <!-- =================================== -->
 
+<!-- Пагинацмя WP с запросом -->
+<?php if ( function_exists( 'wp_corenavi' ) ) wp_corenavi($loop); ?> 
+
+function wp_corenavi($query = null) {
+  
+  global $wp_query;
+  $main_query = (empty($query))?$wp_query:$query;
+  $total = isset( $main_query->max_num_pages ) ? $main_query->max_num_pages : 1;
+  $a['total'] = $total;
+  $a['mid_size'] = 1; // сколько ссылок показывать слева и справа от текущей
+  $a['end_size'] = 1; // сколько ссылок показывать в начале и в конце
+  $a['prev_text'] = '«'; // текст ссылки "Предыдущая страница"
+  $a['next_text'] = '»'; // текст ссылки "Следующая страница"
+
+  if ( $total > 1 ) echo '<div class="nav-links">';
+  echo paginate_links( $a );
+  if ( $total > 1 ) echo '</div>';
+}
+<!-- ======================================================== -->
+
 <!-- Постраничная навигация встроенная в WP -->
 <!-- Код необходимо поместить в файл functions.php  -->
 	function wp_corenavi() {
@@ -529,6 +553,12 @@ add_action( 'wp_enqueue_scripts', 'my_styles_method' );
 	.prev.page-numbers, .next.page-numbers {
 		width: auto;
 	}
+<!-- ============================================= -->
+
+	<!-- Пагинацмя WP -->
+	<div class="pagination">
+		<?php the_posts_pagination(array('prev_text' => '«', 'next_text' => '»'));?>
+	</div>
 <!-- =================================================================================================================================================== -->
 
 
@@ -809,6 +839,48 @@ if ($sub_cats) {
 		wp_reset_postdata();
 		?>
 	</div>
+<!-- =================================== -->
+
+<!-- Выводим таксономии первого уровня -->
+<?			
+	$listCat = wp_list_categories (array(
+		'hierarchical' => true,
+		'taxonomy' => "asgproductcat",
+		'child_of' => get_queried_object()->term_id,
+		'hide_empty' => false,
+		'title_li' => '',
+		'echo' => 0,
+		'depth' => 1,
+		'show_option_none'   => "", 
+	) );
+?>
+  <ul class="menu-side__body-list">
+    <?
+      echo $listCat;
+    ?>	
+  </ul>
+<!-- =================================== -->
+
+<!-- Выводим таксономии первого уровня -->
+<?
+  $terms = get_terms( [
+    'taxonomy' => "asgproductcat",
+    'orderby'=> 'meta_value_num',
+    'meta_key'		=> '_term_index',
+	  'order' => 'ASC',
+	  'include' => [22, 42, 21, 58],
+  ] );
+	foreach( $terms as $term ){
+?>
+  <div class="products-loop">
+    <a href="<?echo get_category_link($term->term_id)?>" class="products-loop__photo" style="background-image: url(<?php echo wp_get_attachment_image_src(carbon_get_term_meta($term->term_id, 'term_photo'), 'full')[0];?>"></a>
+    <div class="cat-products__products-loop-content products-loop__content">
+    	<div class="products-loop__title"><? echo $term->name ?></div>
+    </div>
+  </div>      
+<?
+  }
+?>
 <!-- =================================== -->
 
 	<!-- Вывод дочерних таксономий конкретной таксономии -->
