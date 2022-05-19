@@ -6,11 +6,11 @@
 
 <!-- Подпись главной стр. Выводится из настроек админки -->
 <title><?php wp_title(); ?></title> 
-<!-- =================================== -->
+<!-- =================================== --> 
 
 
 <!-- Подключения template-parts -->
-<?php get_template_part('template-parts/header-section');?> 
+<?php get_template_part('template-parts/header-section');?>   
 <!-- =================================== -->
 
 
@@ -50,6 +50,9 @@ function printit() {
 		WebBrowser1.ExecWB(6, 2);//Use a 1 vs. a 2 for a prompting dialog box WebBrowser1.outerHTML = ""; 
 	}
 }
+
+<!-- Добавляем id страницы. Прописываем в класс. Добавляет класс странице на которой находимся  -->
+<?php if (get_the_ID() == 6976) echo "active";?>
 <!-- ================================================================================================================================================== -->
 
 
@@ -98,6 +101,10 @@ function printit() {
 <picture>
 	<?php echo get_the_post_thumbnail( $post->ID, "turImg", array("alt" => $post->post_title, "title" => $post->post_title));?>
 </picture>
+<!-- =================================== -->
+
+<!-- Вывод картинки страницы, поста, из карбон поля -->
+<img src="<?php echo wp_get_attachment_image_src(carbon_get_post_meta(get_the_ID(),"contacts_img_1"), 'full')[0];?>" alt=""> 	
 <!-- =================================== -->
 
 <!-- Добавляем разные фишки к выводу изображений. Превьюшки и т.д.-->
@@ -213,6 +220,10 @@ function printit() {
 
 <!-- Вывод описания категории -->
 <?php echo category_description(); ?>
+<!-- =================================== -->
+
+<!-- Вывод картинки страницы, поста, из карбон поля -->
+<img src="<?php echo wp_get_attachment_image_src(carbon_get_post_meta(get_the_ID(),"contacts_img_1"), 'full')[0];?>" alt=""> 	
 <!-- =================================== -->
 
 <!-- Если описание не заполненно, блок не выводится -->
@@ -803,7 +814,7 @@ if ($sub_cats) {
 			array(
 				'taxonomy' => 'ultracat',
 				'field' => 'id',
-				'terms' => array(3)
+				'terms' => array(3) 
 			)
 		)
 	);
@@ -936,6 +947,21 @@ if ($terms && !is_wp_error($terms)) {
 
 <!-- Выводим товары рандомно -->
 <?
+	$my_posts = get_posts( array(
+	'numberposts' => -1,
+	'orderby'     => 'rand',
+	'post_type'   => 'ultra',
+				
+	) );
+		foreach ($my_posts as $element) {
+			$param = ["element" => $element];
+			get_template_part('template-parts/product', 'elem', $param); 
+	}
+?>
+<!-- ============================================================== -->
+
+<!-- Выводим товары рандомно, определенной таксономии -->
+<?
 	$args = array(
 		'posts_per_page' => 5,
 		'post_type' => 'ultra',
@@ -957,6 +983,32 @@ if ($terms && !is_wp_error($terms)) {
 				wp_reset_postdata(); 
 	?>
 <!-- =================================== -->
+
+
+<!-- Выводим все созданные таксономии, включая дочерние, с подсветкой выбранной -->
+<?php 
+  $terms = get_terms(
+    array(
+      'taxonomy'   => 'ultracat',
+      'orderby' => 'count',
+      'order' => 'ESC',
+      'hide_empty' => false,
+        )
+      );
+    if ( ! empty( $terms ) && is_array( $terms ) ) {
+      foreach ( $terms as $term ) { 
+        $curTerm = $wp_query->queried_object;
+        $class = ( $term->name == $curTerm->name ) ? 'btnBlock__link_active' : '';
+?>
+  <a href="<?php echo esc_url( get_term_link( $term ) ) ?>" class="btnBlock__link <?php echo $class; ?>">
+    <?php echo $term->name; ?>
+  </a>
+<?php
+    }
+  } 
+?>
+<!-- ========================================================================================= -->
+
 
 <!-- Находясь в конкретной таксономии, выводим ее дочернии таксономии -->
 <div class="main-page__filter d-flex">
@@ -1055,6 +1107,80 @@ if ($terms && !is_wp_error($terms)) {
 		}
 		?>
 <!-- =================================== -->
+
+<!-- Выводим кнопки такосномий и товары таксономий на странице -->
+<!-- Ссылка http://olimphotel.com/dostavka -->
+<div class="btnBlock">
+      <?php 
+        $terms = get_terms(
+          array(
+            'taxonomy'   => 'ultracat',
+            'orderby' => 'count',
+            'order' => 'ESC',
+            'hide_empty' => false,
+            )
+          );
+          if ( ! empty( $terms ) && is_array( $terms ) ) {
+            $cat_index = 0;
+            foreach ( $terms as $term ) { 
+              // $curTerm = $wp_query->queried_object;
+              // $class = ( $term->name == $curTerm->name ) ? 'btnBlock__link_active' : '';
+              ?>
+                <a href="#razdel_menu_<?echo $cat_index;?>" class="btnBlock__link">
+                  <?php echo $term->name; ?>
+                </a>
+              <?php
+              $cat_index++;
+            }
+          } 
+        ?>
+      </div>
+
+      <div class="line-bg"></div>
+      <? 
+        if ( ! empty( $terms ) && is_array( $terms ) ) {
+          $cat_index = 0;
+          foreach ( $terms as $term ) { 
+      ?> 
+        <div class="delivery-block">
+          <h2 id = "razdel_menu_<?echo $cat_index;?>" class="delivery-block__title"><?php echo $term->name; ?></h2>
+          <div class="prodCard__row"> 
+              <?
+                			// $my_posts = get_posts( array(
+                      //   'numberposts' => -1,
+                      //   'post_type'   => 'ultra',
+                      //   'category' => $term->term_id
+                      // ) );
+                
+                      $my_posts = new WP_Query( array( 
+                        'tax_query' => array(
+                          array(
+                            'taxonomy' => 'ultracat',
+                            'field'    => 'id',
+                            'terms'    => $term->term_id
+                          )
+                        )
+                      ) );
+                      // foreach ($my_posts->posts as $element) {
+                      //   $param = ["element" => $element];
+                      //   get_template_part('template-parts/product', 'elem', $param); 
+                      // }
+
+                      while ( $my_posts->have_posts() ) {
+                        $my_posts->the_post();
+                      
+                        get_template_part('template-parts/product', 'elem'); 
+                      }
+                      wp_reset_postdata();
+              ?>
+          </div>
+        </div>
+      <?
+            $cat_index++;
+          }
+        }
+      ?>
+<!-- ========================================================================================== -->
 
 	<!-- Выводим в главной таксномии Продукты все остальные таксномии -->
 	<div class="archive-prod-card galery-block__galery-row prod-card">
