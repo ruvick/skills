@@ -1433,10 +1433,6 @@ if ($terms && !is_wp_error($terms)) {
 
 <!-- ========================================================== ИНТЕРНЕТ-МАГАЗИН ======================================================================= -->
 
-<!-- Карточка товара -->
-
-<!-- =================================== -->
-
 <!-- Кнопка добавления в корзину, на стр Товара -->
 <button class="card__bascet button" id = "btn__to-card" onclick = "add_tocart(this, document.getElementById('pageNumeric').value); return false;"
   data-price = "<?echo carbon_get_post_meta(get_the_ID(),"offer_price"); ?>"
@@ -1449,6 +1445,10 @@ if ($terms && !is_wp_error($terms)) {
   data-picture = "<?php  $imgTm = get_the_post_thumbnail_url( get_the_ID(), "tominiatyre" ); echo empty($imgTm)?get_bloginfo("template_url")."/img/no-photo.jpg":$imgTm; ?>" >
     В корзину
 </button>
+<!-- =================================================================================================================================================== -->
+
+<!-- Разметка цены. Оборачиваем в span с классом price_formator и он автоматически разделяет цифры -->
+<span class = "price_formator"><?php echo carbon_get_the_post_meta('offer_price');?></span>
 <!-- =================================================================================================================================================== -->
 
 
