@@ -30,6 +30,17 @@
 ?>
 <!-- =================================== -->
 
+<!-- Ссылка Скачать. Файл из комплексного поля с текстом -->
+<div class="file-block__item">
+	<?php
+		printf('<a href="%s" download class="file-block__item-icon"></a>', $item['licenses_complex_file']);
+	?>
+	<?php
+		printf('<a href="%s" download><div class="file-block__item-text">' . $item['licenses_complex_name'] . '</div></a>', $item['licenses_complex_file']);
+	?>
+</div>
+<!-- =================================== -->
+
 <!-- Скачать страницу в PDF  -->
 <a href="#" class="card-wrap-properties-links-link" onclick="generatePDF();">Скачать страницу в PDF</p></a>
 <!-- =================================== -->
@@ -64,9 +75,13 @@ function printit() {
 <!-- =================================== -->
  
 <!-- Подключение картинок --> 
-<img src="<?php echo get_template_directory_uri();?>/images/bus-card.jpg" class="spacer" alt="">
+<img src="<?php echo get_template_directory_uri();?>/images/bus-card.jpg" class="spacer" alt="<? the_title();?>">
 
 <section class="booking-title-wrapper" style="background-image: url(<?php echo get_template_directory_uri();?>/images/mir/contact.png);">
+<!-- =================================== -->
+
+<!-- Вывод картинки из карбон поля, из настроек темы -->
+<img src="<?php echo wp_get_attachment_image_src(carbon_get_theme_option("license_picture"), 'full')[0];?>" alt="<? the_title();?>">
 <!-- =================================== -->
 
 <!-- Изображение страницы, поста -->
@@ -81,7 +96,7 @@ function printit() {
 	} ?>
 
 	<!-- Выводим картинку в img -->
-	<img src="<?php echo $banner?>" alt="">
+	<img src="<?php echo $banner?>" alt="<? the_title();?>">
 
 	<!-- Выводим картинку фоном в блоке -->
 	<div class="header-services__img" style="background-image: url(<?php echo $banner?>);"></div>
@@ -93,7 +108,7 @@ function printit() {
 	$thumbnail_url = wp_get_attachment_image_url( $thumbnail_id, 'full' );  // ссылка на полный размер картинки по ID вложения
 ?>
 	<div class="cat-content-img">
-		<img src="<?php echo $thumbnail_url; ?>" alt="" /> 
+		<img src="<?php echo $thumbnail_url; ?>" alt="<? the_title();?>" /> 
 	</div>
 <!-- =================================== -->
 
@@ -104,7 +119,7 @@ function printit() {
 <!-- =================================== -->
 
 <!-- Вывод картинки страницы, поста, из карбон поля -->
-<img src="<?php echo wp_get_attachment_image_src(carbon_get_post_meta(get_the_ID(),"contacts_img_1"), 'full')[0];?>" alt=""> 	
+<img src="<?php echo wp_get_attachment_image_src(carbon_get_post_meta(get_the_ID(),"contacts_img_1"), 'full')[0];?>" alt="<? the_title();?>"> 	
 <!-- =================================== -->
 
 <!-- Добавляем разные фишки к выводу изображений. Превьюшки и т.д.-->
