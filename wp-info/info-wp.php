@@ -39,6 +39,24 @@
 		printf('<a href="%s" download><div class="file-block__item-text">' . $item['licenses_complex_name'] . '</div></a>', $item['licenses_complex_file']);
 	?>
 </div>
+
+<!-- Скачать файл из поля настроек темы -->
+<?
+  $fiz = carbon_get_the_post_meta('fiz_meropriyatiya');
+  $polozg = carbon_get_the_post_meta('pologenie');
+?>
+<? if ($polozg) {?>
+  <a href="<?echo wp_get_attachment_url($polozg);?>" class="about-competition__item">
+    <span class="about-competition__item-icon about-competition__item-icon-01"></span>
+    <p class="about-competition__item-descp">Положение о проведении мероприятия</p>
+  </a>
+<?}?>
+<? if ($fiz) {?>
+  <a href="<?echo wp_get_attachment_url($fiz);?>" class="about-competition__item">
+  	<span class="about-competition__item-icon about-competition__item-icon-02"></span>
+    <p class="about-competition__item-descp">Физкультурные мероприятия</p>
+  </a>
+<?}?>
 <!-- =================================== -->
 
 <!-- Скачать страницу в PDF  -->
