@@ -57,6 +57,7 @@
     <p class="about-competition__item-descp">Физкультурные мероприятия</p>
   </a>
 <?}?>
+Field::make('file', 'fiz_meropriyatiya', 'Физкультурные мероприятия')->set_width(50),
 <!-- =================================== -->
 
 <!-- Скачать страницу в PDF  -->
