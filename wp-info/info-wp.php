@@ -263,10 +263,18 @@ function printit() {
 <!-- Если описание не заполненно, блок не выводится -->
 <? $abouttc = carbon_get_theme_option("about_home");
 	if (!empty($abouttc)) { ?>
-		<p class="company__tagline"></p>
 		<h2 class="about__title"><?php echo carbon_get_theme_option('about_home_title'); ?></h2>
 		<div class="about__subtitle">
 			<p><? echo $abouttc; ?></p>
+		</div>
+<? } ?>
+
+<!-- Вывод текстовых блоков через фильтры -->
+<? $abouttc = carbon_get_theme_option("about_home");
+	if (!empty($abouttc)) { ?>
+		<h2 class="about__title"><?php echo carbon_get_theme_option('about_home_title'); ?></h2>
+		<div class="about__subtitle">
+			<p><? echo apply_filters('the_content', $abouttc); ?></p> 
 		</div>
 <? } ?>
 <!-- =================================== -->
