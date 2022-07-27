@@ -6,7 +6,7 @@
 
 <!-- Подпись главной стр. Выводится из настроек админки -->
 <title><?php wp_title(); ?></title> 
-<!-- =================================== --> 
+<!-- =================================== -->  
 
 
 <!-- Подключения template-parts -->
@@ -1470,6 +1470,25 @@ if ($terms && !is_wp_error($terms)) {
 			}
 		}
 	?>
+
+	<!-- Выводим саму картинку -->
+	<?php 
+	// получаем ID термина на странице термина
+	$term_id = get_queried_object_id();
+	// получим ID картинки из метаполя термина
+	$image_id = get_term_meta( $term_id, '_thumbnail_id', 1 );
+	// ссылка на полный размер картинки по ID вложения
+	$image_url = wp_get_attachment_image_url( $image_id, 'full' );
+	// выводим картинку на экран
+	// echo '<img src="'. $image_url .'" alt="" />';
+?>
+
+<div class="cat-content-img">
+	<img src="<?php echo $image_url; ?>" alt="<? the_title();?>" /> 
+</div>
+
+<section class="page-banner" style="background-image: url(<?php echo $image_url ?>);"> 
+</section>
 <!-- =================================================================================================================================================== -->
 
 
