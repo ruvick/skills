@@ -107,6 +107,10 @@ function printit() {
 <img src="<?php  $imgTm = get_the_post_thumbnail_url( get_the_ID(), "tominiatyre" ); echo empty($imgTm)?get_bloginfo("template_url")."/img/no-photo.jpg":$imgTm; ?>" alt="<? the_title();?>"> 
 <!-- =================================== -->
 
+<!-- Выводим картинку бэкграундом, из страницы или поста -->
+<section style="background-image: url(<?php echo wp_get_attachment_image_src(carbon_get_post_meta(get_the_ID(),"zap_img_1"), 'full')[0];?>);">
+<!-- =================================== -->
+
 <!-- Вывод картинки в переменной. Пишем php-код на странице где выводим картинку --> 
 	<?php 
 		$banner = wp_get_attachment_image_src( carbon_get_the_post_meta('resort_banner'), 'full')[0];
