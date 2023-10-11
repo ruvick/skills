@@ -1,12 +1,25 @@
 <!-- =============================================================== WORDPRESS ============================================================================ -->
 
-<?php echo get_post_type_archive_link('asgproduct');?>
+
+<!-- ======================================================== ВЫВОД ИЗ ПОД АДМИНА ========================================================================= -->
+
+<?php
+if ( is_user_logged_in() && current_user_can('administrator') ){
+?>
+
+<!-- Тут пишем код -->
+
+<?php
+}
+?>
 
 <!-- ======================================================== ПОДКЛЮЧЕНИЯ, ССЫЛКИ ========================================================================= -->
 
+<?php echo get_post_type_archive_link('asgproduct');?>
+
 <!-- Подпись главной стр. Выводится из настроек админки -->
 <title><?php wp_title(); ?></title> 
-<!-- =================================== -->  
+<!-- =================================== -->   
 
 
 <!-- Подключения template-parts -->
@@ -87,6 +100,34 @@ function printit() {
 
 
 <!-- ============================================== КАРТИНКИ ======================================================================================== -->
+
+
+<!-- Произвольный логотип на странице входа wp-login -->
+<?
+add_action( 'login_head', 'my_custom_login_logo' );
+function my_custom_login_logo(){
+
+	echo '
+	<style type="text/css">
+	h1 a {  background-image:url('.get_bloginfo('template_directory').'/images/custom-login-logo.png) !important;  }
+	</style>
+	';
+}
+
+// Изменение url логотипа при входе в админку
+add_filter("login_headerurl", "change_admin_logo_url");
+function change_admin_logo_url()
+{
+    return home_url("/");
+}
+
+// Изменение title логотипа при входе в админку
+add_filter("login_headertitle", "change_title_admin_logo");
+function change_title_admin_logo()
+{
+    return "бла-бла-бла"; // ваш тайтл
+}
+?>
 
 <!-- Подключение логотипа -->  
 <!-- Вставляем вместо Cлова-логотипа в ссылке. Чтобы клиент сам мог его менять из админки -->
@@ -286,7 +327,7 @@ function printit() {
 
 <!-- Соц Сети -->
 	<a href="<?php echo carbon_get_theme_option('as_insta'); ?>" class="soc-block-icon-link soc-icon-1"></a>
-	<a href="<?php echo carbon_get_theme_option('as_vk'); ?>" class="soc-block-icon-link soc-icon-2"></a>
+	<a href="<?php echo carbon_get_theme_option('as_vk'); ?>" class="soc-block-icon-link soc-icon-2"></a> 
 	<a href="<?php echo carbon_get_theme_option('as_telegr'); ?>" class="soc-block-icon-link soc-icon-3"></a>
 	<a href="<?php echo carbon_get_theme_option('as_whatsapp'); ?>" class="soc-block-icon-link soc-icon-4"></a>
 <!-- =================================== -->
@@ -821,6 +862,58 @@ if ($sub_cats) {
 
 <!-- Выводим дочернии категории, основной категории 6 -->
 <?php wp_list_categories( array('child_of' => 6, 'hide_empty'=> 0, 'title_li' => '') ); ?>
+<!-- ================================================================================================== -->
+
+<!-- Выводим дочернии категории, основной категории, на любой странице с картинками категории -->
+<? 
+			$categories = get_categories(
+				array(
+					'parent' => 0,
+					'orderby' => 'ID', 
+					'order' => 'asc',
+					'hide_empty'=> 0,
+			)
+		);
+			foreach ($categories as $category) {
+			// подкатегории
+			$sub_categories = get_categories(
+				array(
+					'orderby' => 'ID', 
+					'order' => 'asc',
+			'parent' => $category->term_id
+			
+			)
+		);
+			foreach ($sub_categories as $sub_category) {
+				$term_id = $sub_category->term_taxonomy_id;
+				// получим ID картинки из метаполя термина
+				$image_id = get_term_meta( $term_id, '_thumbnail_id', 1 );
+				// ссылка на полный размер картинки по ID вложения
+				$image_url = wp_get_attachment_image_url( $image_id, 'full' );
+			echo '
+
+			<div class="products-sec__column">
+				<div class="products-sec__card">
+					<a href="' . get_category_link($sub_category) . '" class="products-sec__card-img _ibg">
+						<img src="'. $image_url .'" alt=""> 
+					</a>
+					<div class="products-sec__card-descp">
+						<h4 class="products-sec__card-descp-title"> 
+						' . $sub_category->name . '
+						</h4>
+						<ul class="products-sec__card-descp-list">
+							<li class="products-sec__card-descp-list-item">от 7800р</li>
+						</ul>
+					</div>
+					<div class="products-sec__card-btn">
+						<a href="' . get_category_link($sub_category) . '" class="products-sec__card-btn-link btn">Подробнее</a>
+						<a href="img/popup.jpg" download class="products-sec__card-btn-link btn btn--price">Прайс-лист</a>
+					</div>
+				</div>
+			</div>';
+				}
+			}
+		?>
 <!-- =================================================================================================================================================== -->
 
 

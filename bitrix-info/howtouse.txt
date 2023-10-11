@@ -1,0 +1,45 @@
+#Тайтл как и ряд другой информации выводится с помощью глобального обьекта $APPLICATION.
+У него есть метод ShowTitle().
+Вывод <title><? $APPLICATION->ShowTitle() ?></title>
+==========================================================
+
+#Для подключения стилей и скриптов, используется специальный класс Asset.
+Импортируем пространство имен класса Asset. Класс используется для подключения стилей и скриптов.
+<?
+use Bitrix\Main\Page\Asset;
+?>
+Используем метод getInstance. У него есть 3 метода, addString, addJs и addCss. Для подключения стилей, скриптов и подключения каких то строк. 
+Например, viewport.
+addCss() в скобочках необходимо указать путь, к папке с активной темой. Для этого используется специальная константа 
+Asset::getInstance()->adCss(SITE_TEMPLATE_PATH . '');
+Константа возвращает путь к активной папке, без концевого слеша. То есть, это будет local/templates/наша тема. И соответсвенно нам нужно продолжить путь слешом
+Asset::getInstance()->adCss(SITE_TEMPLATE_PATH . '/css/style.min.css');
+Подключаем ниже title конструкцию
+	<?
+
+		Asset::getInstance()->adCss(SITE_TEMPLATE_PATH . '/css/style.min.css');
+
+	 ?>
+
+Bitirx позволяет подключать библиотеку jquerry и ряд других библиотек из ядра bitrix.
+Подключение библиотеки из ядра bitirx. 
+CJSCORE и его метод Init(). И далее мы в виде массива указываем набор библиотек которые нам необходимо подключить.
+CJSCORE::Init(['jquerry']);
+=================================================================================
+
+#Подключение viewport и шрифтов из googlefonts.
+Asset::getInstance()->addString ('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
+Asset::getInstance()->addString ('<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">');
+====================================================================
+
+#Для вывода кодировки используется метод ShowHead()
+<? $APPLICATION->ShowHead() ?>
+================================================================
+
+#Для подключения картинок используем <?=SITE_TEMPLATE_PATH?>
+<picture>
+	<source srcset="<?=SITE_TEMPLATE_PATH?>/img/team/04.webp" type="image/webp"><img src="<?=SITE_TEMPLATE_PATH?>/img/team/04.jpg?_v=1633466607061" alt="">
+</picture>
+=======================================================
+
+Для подключения админ-панели в теге body пишем
